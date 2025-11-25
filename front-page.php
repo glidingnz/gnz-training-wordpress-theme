@@ -2,7 +2,13 @@
 
 <div class="container-lg px-3 px-md-4 px-lg-5 d-flex flex-column min-vh-100 justify-content-center">
     <div class="hero-section py-5 text-center">
-        <h1 class="display-4 fw-bold primary-text mb-5">Gliding NZ Training Programme</h1>
+        <img
+            src="https://gliding.co.nz/wp-content/uploads/2013/08/gnz-3.png"
+            onerror="this.onerror=null;this.src='https://placehold.co/200x80/C1272D/FFFFFF?text=GNZ';"
+            alt="<?php esc_attr_e( 'Gliding NZ Logo', 'gliding-nz-training' ); ?>"
+            class="img-fluid"
+        >
+        <h1 class="display-4 fw-bold primary-text mb-5">Pilot Training Programme</h1>
         <!-- Search Bar -->
         <div class="mx-auto my-4" style="max-width: 700px;">
             <p class="h4 fw-bold primary-text mb-3 text-start ps-2">Search for any topic...</p>
@@ -32,15 +38,15 @@
             <h2 class="h3 fw-bold primary-text border-bottom border-danger border-2 pb-2 d-inline-block mb-3">How to Use This Site</h2>
             <ul class="list-unstyled text-secondary d-flex flex-column gap-3">
                 <li class="d-flex align-items-start">
-                    <span class="badge rounded-circle accent-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">1</span>
+                    <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">1</span>
                     <span><strong>Navigate by Stage:</strong> Use the sidebar menu (left) to browse the syllabus chronologically. It's divided into 5 key stages, from Solo to Alpine.</span>
                 </li>
                 <li class="d-flex align-items-start">
-                    <span class="badge rounded-circle accent-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">2</span>
+                    <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">2</span>
                     <span><strong>Search Instantly:</strong> Looking for a specific procedure or rule? Use the search bar above to find pages across all syllabus levels instantly.</span>
                 </li>
                 <li class="d-flex align-items-start">
-                    <span class="badge rounded-circle accent-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">3</span>
+                    <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">3</span>
                     <span><strong>Track Progress:</strong> Consult your physical GNZ Logbook and Training Record card in conjunction with this material to track your real-world progress.</span>
                 </li>
             </ul>
