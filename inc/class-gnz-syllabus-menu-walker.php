@@ -32,6 +32,13 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
     private $current_stage_open = false;
 
     /**
+     * Whether the current root item should display stage numbering.
+     *
+     * @var bool
+     */
+    private $current_stage_numbered = false;
+
+    /**
      * Starts the list before the elements are added.
      *
      * @param string   $output Used to append additional content (passed by reference).
@@ -40,6 +47,8 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
      */
     public function start_lvl( &$output, $depth = 0, $args = null ) {
         if ( 0 === $depth ) {
+            $output .= "\n<div class=\"stages-container mt-3\">\n";
+        } elseif ( 1 === $depth ) {
             $classes  = 'ms-4 mt-1 stage-submenu';
             $classes .= $this->current_stage_open ? '' : ' d-none';
 
@@ -59,8 +68,12 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
      * @param stdClass $args   An object of wp_nav_menu() arguments.
      */
     public function end_lvl( &$output, $depth = 0, $args = null ) {
-        if ( 0 === $depth ) {
+        if ( 0 === $depth || 1 === $depth ) {
             $output .= "</div>\n";
+        }
+
+        if ( 0 === $depth ) {
+            $output .= "<hr />\n";
         }
     }
 
@@ -77,7 +90,39 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
         $item_classes = is_array( $item->classes ) ? $item->classes : array();
 
         if ( 0 === $depth ) {
-            $this->stage_counter++;
+            $this->stage_counter = 0;
+
+            $this->current_stage_numbered = in_array( 'enable-stage-numbers', $item_classes, true );
+            $this->current_stage_numbered = apply_filters( 'gnz_syllabus_stage_numbering_enabled', $this->current_stage_numbered, $item, $args );
+
+            $is_active = in_array( 'current-menu-item', $item_classes, true ) || in_array( 'current-menu-ancestor', $item_classes, true );
+            $classes = 'text-uppercase text-muted small fw-bold mt-5 px-2 text-decoration-none';
+            $classes .= $is_active ? ' primary-text' : ' text-muted';
+
+            $tag   = ! empty( $item->url ) ? 'a' : 'span';
+            $attrs = '';
+
+            if ( 'a' === $tag ) {
+                $attrs = sprintf( ' href="%s"', esc_url( $item->url ) );
+            }
+
+            $output .= '<div class="menu-root">';
+            $output .= sprintf(
+                '<%1$s%2$s class="%3$s">%4$s</%1$s>',
+                $tag,
+                $attrs,
+                esc_attr( $classes ),
+                esc_html( $item->title )
+            );
+            $output .= "</div>\n";
+
+            return;
+        }
+
+        if ( 1 === $depth ) {
+            if ( $this->current_stage_numbered ) {
+                $this->stage_counter++;
+            }
 
             $submenu_id = 'submenu-' . $item->ID;
             $is_open    = in_array( 'current-menu-item', $item_classes, true ) || in_array( 'current-menu-ancestor', $item_classes, true );
@@ -87,6 +132,10 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
 
             $button_classes = 'stage-toggle w-100 d-flex align-items-center justify-content-between btn btn-link text-decoration-none px-2 py-2 primary-text';
             $number_classes = 'stage-number d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0';
+
+            if ( ! $this->current_stage_numbered ) {
+                $button_classes .= ' no-stage-number';
+            }
 
             if ( $is_open ) {
                 $button_classes .= ' is-open';
@@ -102,11 +151,15 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
             );
 
             $output .= '<span class="d-flex align-items-center text-start w-100">';
-            $output .= sprintf(
-                '<span class="%1$s">%2$s</span>',
-                esc_attr( $number_classes ),
-                esc_html( (string) $this->stage_counter )
-            );
+            if ( $this->current_stage_numbered ) {
+                $stage_number = apply_filters( 'gnz_syllabus_stage_number', $this->stage_counter, $item, $args );
+
+                $output .= sprintf(
+                    '<span class="%1$s">%2$s</span>',
+                    esc_attr( $number_classes ),
+                    esc_html( (string) $stage_number )
+                );
+            }
             $output .= sprintf(
                 '<span class="lh-sm flex-grow-1">%s</span>',
                 esc_html( $item->title )
@@ -145,7 +198,7 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
      * @param int      $id     Current item ID.
      */
     public function end_el( &$output, $item, $depth = 0, $args = null ) {
-        if ( 0 === $depth ) {
+        if ( 1 === $depth ) {
             $output .= "</div>\n";
         }
     }

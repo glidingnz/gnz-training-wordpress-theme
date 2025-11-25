@@ -2,7 +2,6 @@
     <div class="sidebar-inner-content d-flex flex-column flex-grow-1">
         <!-- Navigation -->
         <nav class="flex-grow-1 p-3 overflow-auto custom-scroll mt-3">
-            <h6 class="text-uppercase text-muted small fw-bold mb-4 px-2">Syllabus Stages</h6>
 
             <?php if ( has_nav_menu( 'sidebar-menu' ) ) : ?>
                 <?php
