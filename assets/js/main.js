@@ -6,6 +6,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const topicToggles = document.querySelectorAll('.topic-toggle');
     const topicHeadingLinks = document.querySelectorAll('.topic-heading-link');
 
+    const setActiveTopicHeadingById = headingId => {
+        const normalizedId = (headingId || '').replace(/^#/, '');
+        let matched = false;
+
+        topicHeadingLinks.forEach(link => {
+            const linkId = link.dataset.headingId || '';
+            const container = link.closest('.topic-headings');
+            const containerHidden = container && container.classList.contains('d-none');
+            const wrapper = link.closest('.topic-link-wrapper');
+            const toggle = wrapper ? wrapper.querySelector('.topic-toggle') : null;
+            const belongsToActiveTopic = !toggle || toggle.classList.contains('link-active-bg');
+
+            if (containerHidden || !belongsToActiveTopic) {
+                link.classList.remove('topic-heading-link-active');
+                return;
+            }
+
+            const isMatch = (normalizedId === '' && linkId === 'overview') || (normalizedId !== '' && linkId === normalizedId);
+
+            link.classList.toggle('topic-heading-link-active', isMatch);
+
+            if (isMatch) {
+                matched = true;
+            }
+        });
+
+        if (!matched && normalizedId !== '') {
+            const fallback = Array.from(topicHeadingLinks).find(link => {
+                if ((link.dataset.headingId || '') !== 'overview') {
+                    return false;
+                }
+
+                const container = link.closest('.topic-headings');
+                const wrapper = link.closest('.topic-link-wrapper');
+                const toggle = wrapper ? wrapper.querySelector('.topic-toggle') : null;
+
+                return container && !container.classList.contains('d-none') && toggle && toggle.classList.contains('link-active-bg');
+            });
+
+            if (fallback) {
+                fallback.classList.add('topic-heading-link-active');
+            }
+        }
+    };
+
+    const syncActiveTopicHeading = () => {
+        const hash = decodeURIComponent(window.location.hash || '');
+        const headingId = hash.replace(/^#/, '');
+        setActiveTopicHeadingById(headingId);
+    };
+
     // Mobile Sidebar Toggle
     const toggleSidebar = () => {
         const isExpanded = sidebar.classList.contains('sidebar-expanded');
@@ -88,6 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close sidebar after selecting in-page anchor on smaller viewports
     topicHeadingLinks.forEach(link => {
         link.addEventListener('click', () => {
+            const headingId = link.dataset.headingId || '';
+            setActiveTopicHeadingById(headingId === 'overview' ? '' : headingId);
+
             if (!sidebar) {
                 return;
             }
@@ -99,4 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    syncActiveTopicHeading();
+    window.addEventListener('hashchange', syncActiveTopicHeading);
 });

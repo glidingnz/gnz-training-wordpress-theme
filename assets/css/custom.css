@@ -232,6 +232,11 @@ body {
     color: var(--color-link-active) !important;
 }
 
+.topic-heading-link-active {
+    color: var(--color-primary) !important;
+    font-weight: 600;
+}
+
 .link-active-bg .stage-number,
 .link-active-bg .chevron-icon {
     color: var(--color-link-active) !important;

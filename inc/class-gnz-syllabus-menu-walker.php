@@ -309,16 +309,17 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
                 );
 
                 $output .= sprintf(
-                    '<a href="%1$s" class="topic-heading-link d-block small text-decoration-none py-1 text-muted">%2$s</a>',
+                    '<a href="%1$s" class="topic-heading-link d-block small text-decoration-none py-1 text-muted" data-heading-id="overview">%2$s</a>',
                     esc_url( $item->url ),
                     esc_html__( 'Overview', 'gliding-nz-training' )
                 );
 
                 foreach ( $headings as $heading ) {
                     $output .= sprintf(
-                        '<a href="%1$s" class="topic-heading-link d-block small text-decoration-none py-1 text-muted">%2$s</a>',
+                        '<a href="%1$s" class="topic-heading-link d-block small text-decoration-none py-1 text-muted" data-heading-id="%3$s">%2$s</a>',
                         esc_url( $item->url . '#' . $heading['id'] ),
-                        esc_html( $heading['text'] )
+                        esc_html( $heading['text'] ),
+                        esc_attr( $heading['id'] )
                     );
                 }
 
