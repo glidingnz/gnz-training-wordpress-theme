@@ -46,7 +46,9 @@ body {
 /* Sidebar */
 #sidebar {
     transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     z-index: 1050;
     /* Bootstrap z-index */
     background-color: white;
@@ -68,6 +70,7 @@ body {
 
 .sidebar-collapsed {
     width: 4rem;
+    overflow: hidden;
 }
 
 .sidebar-expanded {
