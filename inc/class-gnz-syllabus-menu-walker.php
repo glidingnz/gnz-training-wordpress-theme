@@ -39,6 +39,84 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
     private $current_stage_numbered = false;
 
     /**
+     * Cache of headings indexed by post ID.
+     *
+     * @var array<int, array<int, array<string, string>>>
+     */
+    private $headings_cache = array();
+
+    /**
+     * Extracts h1 headings from a post for use as anchor links.
+     *
+     * @param int $post_id Post ID to inspect.
+     *
+     * @return array<int, array<string, string>>
+     */
+    private function get_topic_headings( $post_id ) {
+        if ( isset( $this->headings_cache[ $post_id ] ) ) {
+            return $this->headings_cache[ $post_id ];
+        }
+
+        $headings = array();
+        $post     = get_post( $post_id );
+
+        if ( ! ( $post instanceof WP_Post ) ) {
+            $this->headings_cache[ $post_id ] = $headings;
+            return $headings;
+        }
+
+        if ( ! class_exists( 'DOMDocument' ) ) {
+            $this->headings_cache[ $post_id ] = $headings;
+            return $headings;
+        }
+
+        $content = apply_filters( 'the_content', $post->post_content );
+
+        if ( '' === trim( wp_strip_all_tags( $content ) ) ) {
+            $this->headings_cache[ $post_id ] = $headings;
+            return $headings;
+        }
+
+        $libxml_previous = libxml_use_internal_errors( true );
+
+        $dom      = new DOMDocument();
+        $html     = '<!DOCTYPE html><html><body>' . $content . '</body></html>';
+        $encoding = function_exists( 'mb_convert_encoding' ) ? mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) : $html;
+
+        $dom->loadHTML( $encoding );
+
+        libxml_clear_errors();
+        libxml_use_internal_errors( $libxml_previous );
+
+        $nodes = $dom->getElementsByTagName( 'h1' );
+
+        foreach ( $nodes as $node ) {
+            $text = trim( $node->textContent );
+
+            if ( '' === $text ) {
+                continue;
+            }
+
+            $id = $node->getAttribute( 'id' );
+
+            if ( '' === $id ) {
+                continue;
+            }
+
+            $headings[] = array(
+                'id'   => $id,
+                'text' => $text,
+            );
+        }
+
+        $headings = apply_filters( 'gnz_syllabus_topic_headings', $headings, $post_id, $post );
+
+        $this->headings_cache[ $post_id ] = $headings;
+
+        return $headings;
+    }
+
+    /**
      * Starts the list before the elements are added.
      *
      * @param string   $output Used to append additional content (passed by reference).
@@ -173,18 +251,88 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
             $output .= "</button>\n";
         } else {
             $is_active = in_array( 'current-menu-item', $item_classes, true );
-            $classes   = 'topic-link d-block text-decoration-none';
 
-            if ( $is_active ) {
-                $classes .= ' link-active-bg fw-bold';
+            $headings = array();
+
+            if ( 'page' === $item->object && ! empty( $item->object_id ) ) {
+                $headings = $this->get_topic_headings( (int) $item->object_id );
             }
 
-            $output .= sprintf(
-                '<a href="%1$s" class="%2$s">%3$s</a>',
-                esc_url( $item->url ),
-                esc_attr( $classes ),
-                esc_html( $item->title )
-            );
+            $has_headings = ! empty( $headings );
+            $submenu_id   = 'topic-submenu-' . $item->ID;
+
+            $link_classes = 'topic-link d-block text-decoration-none';
+
+            if ( $is_active ) {
+                $link_classes .= ' link-active-bg fw-bold';
+            }
+
+            $output .= '<div class="topic-link-wrapper">';
+
+            if ( $has_headings ) {
+                $button_classes = 'topic-toggle w-100 d-flex align-items-center justify-content-between btn btn-link text-decoration-none px-2 py-2 primary-text';
+
+                if ( $is_active ) {
+                    $button_classes .= ' link-active-bg fw-bold is-open';
+                }
+
+                $output .= sprintf(
+                    '<button type="button" class="%1$s" data-target="%2$s" aria-expanded="%3$s">',
+                    esc_attr( $button_classes ),
+                    esc_attr( $submenu_id ),
+                    $is_active ? 'true' : 'false'
+                );
+
+                $output .= '<span class="d-flex align-items-center text-start w-100">';
+                $output .= sprintf(
+                    '<span class="lh-sm flex-grow-1 topic-toggle-label">%s</span>',
+                    esc_html( $item->title )
+                );
+                $output .= '</span>';
+
+                $output .= sprintf(
+                    '<svg class="chevron-icon text-muted %1$s" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>',
+                    $is_active ? 'rotate-90' : ''
+                );
+                $output .= '</button>';
+
+                $container_classes = 'topic-headings mt-2 ps-3 border-start';
+
+                if ( ! $is_active ) {
+                    $container_classes .= ' d-none';
+                }
+
+                $output .= sprintf(
+                    '<div id="%1$s" class="%2$s">',
+                    esc_attr( $submenu_id ),
+                    esc_attr( $container_classes )
+                );
+
+                $output .= sprintf(
+                    '<a href="%1$s" class="topic-heading-link d-block small text-decoration-none py-1 text-muted">%2$s</a>',
+                    esc_url( $item->url ),
+                    esc_html__( 'Overview', 'gliding-nz-training' )
+                );
+
+                foreach ( $headings as $heading ) {
+                    $output .= sprintf(
+                        '<a href="%1$s" class="topic-heading-link d-block small text-decoration-none py-1 text-muted">%2$s</a>',
+                        esc_url( $item->url . '#' . $heading['id'] ),
+                        esc_html( $heading['text'] )
+                    );
+                }
+
+                $output .= '</div>';
+            } else {
+                $output .= sprintf(
+                    '<a href="%1$s" class="%2$s">%3$s</a>',
+                    esc_url( $item->url ),
+                    esc_attr( $link_classes ),
+                    esc_html( $item->title )
+                );
+            }
+
+            $output .= '</div>';
         }
     }
 

@@ -199,6 +199,39 @@ body {
     color: var(--color-link-active) !important;
 }
 
+.topic-link-wrapper {
+    margin-bottom: 0.25rem;
+}
+
+.topic-toggle {
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.topic-toggle:hover {
+    background-color: #f3f4f6;
+    text-decoration: none;
+}
+
+.topic-toggle.primary-text {
+    color: var(--color-primary);
+}
+
+.topic-toggle .chevron-icon {
+    margin-left: 0.5rem;
+}
+
+.topic-toggle.is-open:not(.link-active-bg) {
+    background-color: #f3f4f6;
+}
+
+.topic-toggle.link-active-bg .chevron-icon {
+    color: var(--color-link-active) !important;
+}
+
 .link-active-bg .stage-number,
 .link-active-bg .chevron-icon {
     color: var(--color-link-active) !important;
@@ -262,6 +295,13 @@ h4,
 h5,
 h6 {
     color: var(--color-primary);
+}
+
+@media (max-width: 991.98px) {
+    /* Offset in-page anchors so sticky mobile header does not obscure headings */
+    #main-content h1 {
+        scroll-margin-top: 5rem;
+    }
 }
 
 .menu-item-stage + .menu-item-stage {
