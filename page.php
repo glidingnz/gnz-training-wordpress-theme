@@ -93,22 +93,24 @@
             if ( $previous_page || $next_page ) :
                 ?>
                 <nav class="mt-5 pt-4 border-top">
-                    <div class="row g-3">
+                    <div class="topic-nav d-flex align-items-start gap-3">
                         <?php if ( $previous_page ) : ?>
-                            <div class="col-12 col-md-6">
-                                <a class="d-block p-3 rounded-4 border text-decoration-none h-100" href="<?php echo esc_url( get_permalink( $previous_page->ID ) ); ?>" rel="prev">
-                                    <span class="text-uppercase small text-muted d-block mb-2"><?php esc_html_e( 'Previous Topic', 'gliding-nz-training' ); ?></span>
-                                    <span class="fw-semibold primary-text d-block"><?php echo esc_html( get_the_title( $previous_page->ID ) ); ?></span>
-                                </a>
-                            </div>
+                            <a class="topic-nav-link d-flex align-items-center gap-2 text-decoration-none" href="<?php echo esc_url( get_permalink( $previous_page->ID ) ); ?>" rel="prev">
+                                <span class="topic-nav-arrow" aria-hidden="true">&larr;</span>
+                                <span>
+                                    <span class="text-muted small text-uppercase d-block"><?php esc_html_e( 'Previous Topic', 'gliding-nz-training' ); ?></span>
+                                    <span class="primary-text fw-semibold d-block"><?php echo esc_html( get_the_title( $previous_page->ID ) ); ?></span>
+                                </span>
+                            </a>
                         <?php endif; ?>
                         <?php if ( $next_page ) : ?>
-                            <div class="col-12 col-md-6 text-md-end">
-                                <a class="d-block p-3 rounded-4 border text-decoration-none h-100" href="<?php echo esc_url( get_permalink( $next_page->ID ) ); ?>" rel="next">
-                                    <span class="text-uppercase small text-muted d-block mb-2"><?php esc_html_e( 'Next Topic', 'gliding-nz-training' ); ?></span>
-                                    <span class="fw-semibold primary-text d-block"><?php echo esc_html( get_the_title( $next_page->ID ) ); ?></span>
-                                </a>
-                            </div>
+                            <a class="topic-nav-link d-flex align-items-center gap-2 text-decoration-none ms-auto justify-content-end text-end" href="<?php echo esc_url( get_permalink( $next_page->ID ) ); ?>" rel="next">
+                                <span>
+                                    <span class="text-muted small text-uppercase d-block"><?php esc_html_e( 'Next Topic', 'gliding-nz-training' ); ?></span>
+                                    <span class="primary-text fw-semibold d-block"><?php echo esc_html( get_the_title( $next_page->ID ) ); ?></span>
+                                </span>
+                                <span class="topic-nav-arrow" aria-hidden="true">&rarr;</span>
+                            </a>
                         <?php endif; ?>
                     </div>
                 </nav>

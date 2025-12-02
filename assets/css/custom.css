@@ -287,6 +287,24 @@ body {
     border-radius: 0.25rem;
 }
 
+.topic-nav {
+    flex-wrap: nowrap;
+}
+
+.topic-nav-link {
+    font-size: 0.95rem;
+    color: inherit;
+}
+
+.topic-nav-link:hover .primary-text {
+    text-decoration: underline;
+}
+
+.topic-nav-arrow {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
 .search-input:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 4px rgba(14, 42, 92, 0.2);
