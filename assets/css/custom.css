@@ -31,6 +31,10 @@ body {
     color: var(--color-primary);
 }
 
+.primary-text {
+    color: var(--color-primary);
+}
+
 .accent-bg {
     background-color: var(--color-accent);
 }
@@ -277,9 +281,15 @@ body {
     transition: all 0.3s;
 }
 
+.search-highlight {
+    background-color: #fff3cd;
+    padding: 0 0.15rem;
+    border-radius: 0.25rem;
+}
+
 .search-input:focus {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 4px rgba(116, 169, 200, 0.2);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(14, 42, 92, 0.2);
 }
 
 .search-icon {

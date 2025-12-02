@@ -35,3 +35,104 @@ function gnz_add_active_class($classes, $item) {
     return $classes;
 }
 add_filter('nav_menu_css_class', 'gnz_add_active_class', 10, 2);
+
+function gnz_get_highlight_terms() {
+    if (!isset($_GET['highlight'])) {
+        return array();
+    }
+
+    $raw_value = wp_unslash((string) $_GET['highlight']);
+    $normalized_value = preg_replace('/\s+/u', ' ', $raw_value);
+
+    if (null === $normalized_value) {
+        $normalized_value = $raw_value;
+    }
+
+    $normalized = trim($normalized_value);
+
+    if ('' === $normalized) {
+        return array();
+    }
+
+    $parts = preg_split('/\s+/u', $normalized, -1, PREG_SPLIT_NO_EMPTY);
+
+    if (false === $parts || empty($parts)) {
+        return array();
+    }
+
+    $parts = array_map('sanitize_text_field', $parts);
+    $parts = array_filter(array_map('trim', $parts));
+
+    return array_values(array_unique($parts));
+}
+
+function gnz_highlight_terms_in_content($content) {
+    if (is_admin() || !is_singular() || !in_the_loop() || !is_main_query()) {
+        return $content;
+    }
+
+    $terms = gnz_get_highlight_terms();
+
+    if (empty($terms) || '' === $content) {
+        return $content;
+    }
+
+    $escaped_terms = array();
+
+    foreach ($terms as $term) {
+        $term = preg_quote($term, '/');
+
+        if ('' !== $term) {
+            $escaped_terms[] = $term;
+        }
+    }
+
+    if (empty($escaped_terms)) {
+        return $content;
+    }
+
+    $pattern = '/(' . implode('|', $escaped_terms) . ')/iu';
+    $segments = preg_split('/(<[^>]+>)/u', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+    if (false === $segments || empty($segments)) {
+        return $content;
+    }
+
+    $skip_stack = array();
+    $highlighted_output = '';
+
+    foreach ($segments as $segment) {
+        if ('' === $segment) {
+            continue;
+        }
+
+        if ('<' === $segment[0]) {
+            if (preg_match('/^<\s*\/(script|style|mark)\b/i', $segment)) {
+                if (!empty($skip_stack)) {
+                    array_pop($skip_stack);
+                }
+            } elseif (preg_match('/^<\s*(script|style|mark)\b/i', $segment)) {
+                $skip_stack[] = true;
+            }
+
+            $highlighted_output .= $segment;
+            continue;
+        }
+
+        if (!empty($skip_stack)) {
+            $highlighted_output .= $segment;
+            continue;
+        }
+
+        $replaced = preg_replace($pattern, '<mark class="search-highlight">$1</mark>', $segment);
+
+        if (null === $replaced) {
+            $highlighted_output .= $segment;
+        } else {
+            $highlighted_output .= $replaced;
+        }
+    }
+
+    return $highlighted_output;
+}
+add_filter('the_content', 'gnz_highlight_terms_in_content', 20);
