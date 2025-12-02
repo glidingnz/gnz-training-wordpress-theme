@@ -92,6 +92,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const shouldOpen = targetMenu.classList.contains('d-none');
 
+            if (shouldOpen) {
+                // Collapse any other open stage accordions when opening a new one
+                stageToggles.forEach(otherButton => {
+                    if (otherButton === button) {
+                        return;
+                    }
+
+                    const otherTargetId = otherButton.getAttribute('data-target');
+                    const otherMenu = document.getElementById(otherTargetId);
+
+                    if (!otherMenu || otherMenu.classList.contains('d-none')) {
+                        return;
+                    }
+
+                    const otherChevron = otherButton.querySelector('.chevron-icon');
+                    const otherStageNumber = otherButton.querySelector('.stage-number');
+
+                    otherMenu.classList.add('d-none');
+                    otherButton.classList.remove('is-open');
+                    otherButton.setAttribute('aria-expanded', 'false');
+
+                    if (otherChevron) {
+                        otherChevron.classList.remove('rotate-90');
+                    }
+
+                    if (otherStageNumber) {
+                        otherStageNumber.classList.remove('accent-bg');
+                        otherStageNumber.classList.remove('text-white');
+                    }
+                });
+            }
+
             targetMenu.classList.toggle('d-none', !shouldOpen);
             button.classList.toggle('is-open', shouldOpen);
             button.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
@@ -121,6 +153,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const shouldOpen = targetMenu.classList.contains('d-none');
+
+            if (shouldOpen) {
+                const wrapper = button.closest('.topic-link-wrapper');
+                const container = wrapper ? wrapper.parentElement : null;
+                const scopeToggles = container ? container.querySelectorAll('.topic-toggle') : topicToggles;
+
+                scopeToggles.forEach(otherButton => {
+                    if (otherButton === button) {
+                        return;
+                    }
+
+                    const otherTargetId = otherButton.getAttribute('data-target');
+                    const otherMenu = document.getElementById(otherTargetId);
+
+                    if (!otherMenu || otherMenu.classList.contains('d-none')) {
+                        return;
+                    }
+
+                    const otherChevron = otherButton.querySelector('.chevron-icon');
+
+                    otherMenu.classList.add('d-none');
+                    otherButton.classList.remove('is-open');
+                    otherButton.setAttribute('aria-expanded', 'false');
+
+                    if (!otherButton.classList.contains('link-active-bg')) {
+                        otherButton.classList.remove('fw-bold');
+                    }
+
+                    if (otherChevron) {
+                        otherChevron.classList.remove('rotate-90');
+                    }
+                });
+            }
 
             targetMenu.classList.toggle('d-none', !shouldOpen);
             button.classList.toggle('is-open', shouldOpen);
