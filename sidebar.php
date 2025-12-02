@@ -12,23 +12,7 @@
         </a>
         <!-- Navigation -->
         <nav class="flex-grow-1 p-3 overflow-auto custom-scroll mt-3">
-
-            <?php if ( has_nav_menu( 'sidebar-menu' ) ) : ?>
-                <?php
-                wp_nav_menu(
-                    array(
-                        'theme_location' => 'sidebar-menu',
-                        'container'      => false,
-                        'items_wrap'     => '%3$s',
-                        'walker'         => new GNZ_Syllabus_Menu_Walker(),
-                    )
-                );
-                ?>
-            <?php else : ?>
-                <p class="text-muted small px-2">
-                    <?php esc_html_e( 'Assign the "Sidebar Syllabus Menu" under Appearance > Menus to populate the training navigation.', 'gliding-nz-training' ); ?>
-                </p>
-            <?php endif; ?>
+            <?php GNZ_Syllabus_Sidebar::render(); ?>
         </nav>
     </div>
 </div>

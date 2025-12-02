@@ -1,5 +1,5 @@
 <?php
-require_once get_template_directory() . '/inc/class-gnz-syllabus-menu-walker.php';
+require_once get_template_directory() . '/inc/class-gnz-syllabus-sidebar.php';
 
 function gnz_enqueue_scripts() {
     // Bootstrap 5
@@ -21,20 +21,8 @@ add_action('wp_enqueue_scripts', 'gnz_enqueue_scripts');
 function gnz_setup() {
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
-    register_nav_menus(array(
-        'sidebar-menu' => __('Sidebar Syllabus Menu', 'gliding-nz-training'),
-    ));
 }
 add_action('after_setup_theme', 'gnz_setup');
-
-// Add active class to menu items
-function gnz_add_active_class($classes, $item) {
-    if (in_array('current-menu-item', $classes) || in_array('current-menu-ancestor', $classes)) {
-        $classes[] = 'active';
-    }
-    return $classes;
-}
-add_filter('nav_menu_css_class', 'gnz_add_active_class', 10, 2);
 
 function gnz_get_highlight_terms() {
     if (!isset($_GET['highlight'])) {
@@ -136,3 +124,95 @@ function gnz_highlight_terms_in_content($content) {
     return $highlighted_output;
 }
 add_filter('the_content', 'gnz_highlight_terms_in_content', 20);
+
+function gnz_register_sidebar_meta_box() {
+    add_meta_box(
+        'gnz-sidebar-options',
+        __('Sidebar Options', 'gliding-nz-training'),
+        'gnz_render_sidebar_meta_box',
+        'page',
+        'side',
+        'default'
+    );
+}
+add_action('add_meta_boxes', 'gnz_register_sidebar_meta_box');
+
+function gnz_render_sidebar_meta_box($post) {
+    wp_nonce_field('gnz_sidebar_meta_box', 'gnz_sidebar_meta_box_nonce');
+
+    $has_parent = wp_get_post_parent_id($post->ID);
+
+    if ($has_parent) {
+        echo '<p class="description">' . esc_html__( 'Stage numbering can only be managed on top-level pages.', 'gliding-nz-training' ) . '</p>';
+        return;
+    }
+
+    $disabled = get_post_meta($post->ID, '_gnz_disable_stage_numbers', true);
+    ?>
+    <p>
+        <label>
+            <input type="checkbox" name="gnz_disable_stage_numbers" value="1" <?php checked('1', $disabled); ?> />
+            <?php esc_html_e('Hide stage numbering for this section in the sidebar', 'gliding-nz-training'); ?>
+        </label>
+    </p>
+    <?php
+}
+
+function gnz_save_sidebar_meta_box($post_id) {
+    if (!isset($_POST['gnz_sidebar_meta_box_nonce']) || !wp_verify_nonce($_POST['gnz_sidebar_meta_box_nonce'], 'gnz_sidebar_meta_box')) {
+        return;
+    }
+
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    if (!current_user_can('edit_page', $post_id)) {
+        return;
+    }
+
+    $is_top_level = !wp_get_post_parent_id($post_id);
+
+    if (!$is_top_level) {
+        delete_post_meta($post_id, '_gnz_disable_stage_numbers');
+        return;
+    }
+
+    $value = isset($_POST['gnz_disable_stage_numbers']) ? '1' : '';
+
+    if ('' === $value) {
+        delete_post_meta($post_id, '_gnz_disable_stage_numbers');
+    } else {
+        update_post_meta($post_id, '_gnz_disable_stage_numbers', '1');
+    }
+}
+add_action('save_post_page', 'gnz_save_sidebar_meta_box');
+
+function gnz_disable_nav_menu_screens() {
+    if (!apply_filters('gnz_disable_nav_menu_screen', true)) {
+        return;
+    }
+
+    remove_menu_page('nav-menus.php');
+}
+add_action('admin_menu', 'gnz_disable_nav_menu_screens', 999);
+
+function gnz_disable_nav_menu_admin_bar($wp_admin_bar) {
+    if (!apply_filters('gnz_disable_nav_menu_screen', true)) {
+        return;
+    }
+
+    $wp_admin_bar->remove_menu('menus');
+}
+add_action('admin_bar_menu', 'gnz_disable_nav_menu_admin_bar', 999);
+
+function gnz_disable_nav_menu_customizer($wp_customize) {
+    if (!apply_filters('gnz_disable_nav_menu_screen', true)) {
+        return;
+    }
+
+    if (isset($wp_customize->nav_menus)) {
+        $wp_customize->remove_panel('nav_menus');
+    }
+}
+add_action('customize_register', 'gnz_disable_nav_menu_customizer', 20);
