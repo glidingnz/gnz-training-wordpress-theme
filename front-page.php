@@ -38,9 +38,9 @@
             </ul>
         </div>
         <div class="col-12 col-lg-6">
-            <h2 class="h3 fw-bold primary-text border-bottom border-danger border-2 pb-2 d-inline-block mb-3">About the Programme</h2>
+            <h2 class="h3 fw-bold primary-text border-bottom border-danger border-2 pb-2 d-inline-block mb-3">About the Program</h2>
             <p class="text-secondary lh-lg">
-                The Gliding New Zealand (GNZ) training programme is designed to take you from your very first trial flight all the way to becoming an expert cross-country, competition, or alpine pilot.
+                The Gliding New Zealand (GNZ) training program is designed to take you from your very first trial flight all the way to becoming an expert cross-country, competition, or alpine pilot.
             </p>
             <p class="text-secondary lh-lg">
                 Our syllabus is competency-based, meaning you progress at your own pace as you master each skill. Whether you are learning to fly solo or refining advanced soaring techniques, this portal serves as your comprehensive reference guide.

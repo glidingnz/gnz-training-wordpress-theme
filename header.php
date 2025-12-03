@@ -25,7 +25,7 @@
                 class="me-2"
                 style="max-height: 2rem;"
             >
-            <span class="fw-bold primary-text">GNZ Pilot Training Programme</span>
+            <span class="fw-bold primary-text">GNZ Pilot Training Program</span>
             </a>
         </div>
 

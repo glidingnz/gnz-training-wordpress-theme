@@ -8,7 +8,7 @@
                 class="img-fluid"
                 id="sidebar-logo"
             >
-            <span class="sidebar-programme fw-bold primary-text text-center mt-2"><?php esc_html_e( 'Pilot Training Programme', 'gliding-nz-training' ); ?></span>
+            <span class="sidebar-program fw-bold primary-text text-center mt-2"><?php esc_html_e( 'Pilot Training Program', 'gliding-nz-training' ); ?></span>
         </a>
         <!-- Navigation -->
         <nav class="flex-grow-1 p-3 overflow-auto custom-scroll mt-3">
