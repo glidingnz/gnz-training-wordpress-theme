@@ -15,8 +15,62 @@ function gnz_enqueue_scripts() {
 
     // Theme Scripts
     wp_enqueue_script('gnz-script', get_template_directory_uri() . '/assets/js/main.js', array('bootstrap-bundle'), '1.0.0', true);
+
+    $pass_banner_css = gnz_get_pass_banner_styles();
+
+    if (!empty($pass_banner_css)) {
+        wp_add_inline_style('gnz-style', $pass_banner_css);
+    }
 }
 add_action('wp_enqueue_scripts', 'gnz_enqueue_scripts');
+
+function gnz_get_pass_banner_styles() {
+    $css = <<<CSS
+.gnz-pass-banner {
+    border-left: 6px solid #1f7a36;
+    background: linear-gradient(90deg, #e6f6ea 0%, #f3fbf5 100%);
+    color: #0d3a1d;
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 18px 30px -20px rgba(31, 122, 54, 0.55);
+}
+
+.gnz-pass-banner__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gnz-pass-banner__heading {
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.gnz-pass-banner__body {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.gnz-pass-banner a {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+}
+CSS;
+
+    return trim($css);
+}
+
+function gnz_enqueue_pass_banner_editor_styles() {
+    $pass_banner_css = gnz_get_pass_banner_styles();
+
+    if (!empty($pass_banner_css)) {
+        wp_add_inline_style('wp-block-library', $pass_banner_css);
+    }
+}
+add_action('enqueue_block_editor_assets', 'gnz_enqueue_pass_banner_editor_styles');
 
 function gnz_setup() {
     add_theme_support('title-tag');
@@ -296,3 +350,51 @@ function gnz_disable_nav_menu_customizer($wp_customize) {
     }
 }
 add_action('customize_register', 'gnz_disable_nav_menu_customizer', 20);
+
+function gnz_register_pass_callout_pattern() {
+    if (!function_exists('register_block_pattern')) {
+        return;
+    }
+
+    if (function_exists('register_block_pattern_category')) {
+        $registry = WP_Block_Pattern_Categories_Registry::get_instance();
+
+        if (method_exists($registry, 'is_registered')) {
+            $category_exists = $registry->is_registered('gnz-callouts');
+        } else {
+            $registered       = $registry->get_all_registered();
+            $category_exists  = isset($registered['gnz-callouts']);
+        }
+
+        if (!$category_exists) {
+            register_block_pattern_category('gnz-callouts', array(
+                'label' => __('GNZ Callouts', 'gliding-nz-training'),
+            ));
+        }
+    }
+
+    $content = <<<'HTML'
+<!-- wp:group {"style":{"spacing":{"padding":{"top":"1.25rem","right":"1.5rem","bottom":"1.25rem","left":"1.5rem"},"blockGap":"1rem"}},"className":"gnz-pass-banner","layout":{"type":"constrained"}} -->
+<div class="wp-block-group gnz-pass-banner"><!-- wp:group {"style":{"spacing":{"blockGap":"0.5rem"}},"className":"gnz-pass-banner__content","layout":{"type":"constrained"}} -->
+<div class="wp-block-group gnz-pass-banner__content"><!-- wp:paragraph {"style":{"typography":{"textTransform":"uppercase","letterSpacing":"0.12em","fontSize":"0.9rem"}},"className":"gnz-pass-banner__heading"} -->
+<p class="gnz-pass-banner__heading">Pass</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"gnz-pass-banner__body"} -->
+<p class="gnz-pass-banner__body">Replace this copy with the pass criteria for this activity.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+HTML;
+
+    register_block_pattern(
+        'gliding-nz-training/pass-callout',
+        array(
+            'title'       => __('Pass Criteria Callout', 'gliding-nz-training'),
+            'description' => __('Draw attention to the pass requirements with a branded callout banner.', 'gliding-nz-training'),
+            'categories'  => array('gnz-callouts'),
+            'content'     => $content,
+        )
+    );
+}
+add_action('init', 'gnz_register_pass_callout_pattern');

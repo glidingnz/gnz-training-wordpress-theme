@@ -346,3 +346,8 @@ h6 {
     font-weight: 700;
     font-size: 1rem;
 }
+
+.menu-root-label {
+    display: block;
+    cursor: default;
+}

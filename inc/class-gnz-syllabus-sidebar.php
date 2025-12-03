@@ -105,17 +105,16 @@ class GNZ_Syllabus_Sidebar {
 
         $children     = isset( $pages_by_parent[ $root_page->ID ] ) ? $pages_by_parent[ $root_page->ID ] : array();
         $is_active    = self::is_in_branch( $root_page->ID, $current_id );
-        $root_classes = 'text-uppercase text-muted small fw-bold mt-5 px-2 text-decoration-none';
+        $root_classes = 'menu-root-label text-uppercase text-muted small fw-bold px-2 d-block';
         $root_classes .= $is_active ? ' primary-text' : ' text-muted';
 
-        $root_link = sprintf(
-            '<a href="%1$s" class="%2$s">%3$s</a>',
-            esc_url( get_permalink( $root_page ) ),
+        $root_markup = sprintf(
+            '<span class="%1$s">%2$s</span>',
             esc_attr( $root_classes ),
             esc_html( get_the_title( $root_page ) )
         );
 
-        $output  = "<div class=\"menu-root\">{$root_link}</div>\n";
+        $output  = "<div class=\"menu-root\">{$root_markup}</div>\n";
         $output .= "<div class=\"stages-container mt-3\">\n";
 
         $stage_counter            = 0;
