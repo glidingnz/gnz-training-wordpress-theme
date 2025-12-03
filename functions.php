@@ -125,6 +125,86 @@ function gnz_highlight_terms_in_content($content) {
 }
 add_filter('the_content', 'gnz_highlight_terms_in_content', 20);
 
+function gnz_get_placeholder_page_ids($post_type = 'page') {
+    static $cache = array();
+
+    if (isset($cache[$post_type])) {
+        return $cache[$post_type];
+    }
+
+    if (!post_type_exists($post_type)) {
+        $cache[$post_type] = array();
+        return $cache[$post_type];
+    }
+
+    $page_ids = get_pages(array(
+        'fields'      => 'ids',
+        'post_type'   => $post_type,
+        'post_status' => array('publish'),
+        'hierarchical'=> false,
+    ));
+
+    if (empty($page_ids)) {
+        $cache[$post_type] = array();
+        return $cache[$post_type];
+    }
+
+    $placeholder_ids = array();
+
+    foreach ($page_ids as $page_id) {
+        $depth = count(get_post_ancestors($page_id));
+
+        if ($depth <= 1) {
+            $placeholder_ids[] = (int) $page_id;
+        }
+    }
+
+    $cache[$post_type] = $placeholder_ids;
+
+    return $cache[$post_type];
+}
+
+function gnz_is_placeholder_page($post) {
+    $post_obj = get_post($post);
+
+    if (!$post_obj instanceof WP_Post) {
+        return false;
+    }
+
+    $placeholders = gnz_get_placeholder_page_ids($post_obj->post_type);
+
+    if (empty($placeholders)) {
+        return false;
+    }
+
+    return in_array((int) $post_obj->ID, $placeholders, true);
+}
+
+function gnz_exclude_placeholder_pages_from_search($query) {
+    if (!($query instanceof WP_Query)) {
+        return;
+    }
+
+    if (is_admin() || !$query->is_main_query() || !$query->is_search()) {
+        return;
+    }
+
+    $placeholders = gnz_get_placeholder_page_ids('page');
+
+    if (empty($placeholders)) {
+        return;
+    }
+
+    $existing = $query->get('post__not_in');
+
+    if (!is_array($existing)) {
+        $existing = array();
+    }
+
+    $query->set('post__not_in', array_values(array_unique(array_merge($existing, $placeholders))));
+}
+add_action('pre_get_posts', 'gnz_exclude_placeholder_pages_from_search');
+
 function gnz_register_sidebar_meta_box() {
     add_meta_box(
         'gnz-sidebar-options',

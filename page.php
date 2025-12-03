@@ -26,67 +26,80 @@
             $current_id = get_the_ID();
             $post_type  = get_post_type( $current_id );
 
-            $all_pages = get_pages( array(
-                'sort_column' => 'menu_order,post_title',
-                'post_type'   => $post_type,
-                'post_status' => 'publish',
-            ) );
+            $placeholder_ids    = gnz_get_placeholder_page_ids( $post_type );
+            $placeholder_lookup = empty( $placeholder_ids ) ? array() : array_fill_keys( array_map( 'intval', $placeholder_ids ), true );
+            $previous_page      = null;
+            $next_page          = null;
 
-            $pages_by_parent = array();
+            $ancestors = get_post_ancestors( $current_id );
 
-            foreach ( $all_pages as $page ) {
-                $parent_id = (int) $page->post_parent;
+            if ( empty( $placeholder_lookup[ $current_id ] ) && count( $ancestors ) >= 2 ) {
+                $secondary_parent_id = (int) $ancestors[ count( $ancestors ) - 2 ];
 
-                if ( ! isset( $pages_by_parent[ $parent_id ] ) ) {
-                    $pages_by_parent[ $parent_id ] = array();
+                $all_pages = get_pages( array(
+                    'sort_column' => 'menu_order,post_title',
+                    'post_type'   => $post_type,
+                    'post_status' => 'publish',
+                ) );
+
+                $pages_by_parent = array();
+
+                foreach ( $all_pages as $page ) {
+                    $parent_id = (int) $page->post_parent;
+
+                    if ( ! isset( $pages_by_parent[ $parent_id ] ) ) {
+                        $pages_by_parent[ $parent_id ] = array();
+                    }
+
+                    $pages_by_parent[ $parent_id ][] = $page;
                 }
 
-                $pages_by_parent[ $parent_id ][] = $page;
-            }
+                foreach ( $pages_by_parent as &$group ) {
+                    usort(
+                        $group,
+                        static function ( $a, $b ) {
+                            if ( $a->menu_order === $b->menu_order ) {
+                                return strcasecmp( $a->post_title, $b->post_title );
+                            }
 
-            foreach ( $pages_by_parent as &$group ) {
-                usort(
-                    $group,
-                    static function ( $a, $b ) {
-                        if ( $a->menu_order === $b->menu_order ) {
-                            return strcasecmp( $a->post_title, $b->post_title );
+                            return $a->menu_order <=> $b->menu_order;
+                        }
+                    );
+                }
+                unset( $group );
+
+                $ordered_ids = array();
+
+                $collect_hierarchy = static function ( $parent_id, $pages_by_parent, &$ordered_ids, $collect_hierarchy, $exclude_lookup ) {
+                    if ( empty( $pages_by_parent[ $parent_id ] ) ) {
+                        return;
+                    }
+
+                    foreach ( $pages_by_parent[ $parent_id ] as $page ) {
+                        $page_id = (int) $page->ID;
+
+                        if ( empty( $exclude_lookup[ $page_id ] ) ) {
+                            $ordered_ids[] = $page_id;
                         }
 
-                        return $a->menu_order <=> $b->menu_order;
+                        $collect_hierarchy( $page_id, $pages_by_parent, $ordered_ids, $collect_hierarchy, $exclude_lookup );
                     }
-                );
-            }
-            unset( $group );
+                };
 
-            $ordered_ids = array();
+                $collect_hierarchy( $secondary_parent_id, $pages_by_parent, $ordered_ids, $collect_hierarchy, $placeholder_lookup );
 
-            $collect_hierarchy = static function ( $parent_id, $pages_by_parent, &$ordered_ids, $collect_hierarchy ) {
-                if ( empty( $pages_by_parent[ $parent_id ] ) ) {
-                    return;
-                }
+                $ordered_ids = array_values( array_unique( $ordered_ids ) );
 
-                foreach ( $pages_by_parent[ $parent_id ] as $page ) {
-                    $ordered_ids[] = (int) $page->ID;
-                    $collect_hierarchy( (int) $page->ID, $pages_by_parent, $ordered_ids, $collect_hierarchy );
-                }
-            };
+                $current_index = array_search( $current_id, $ordered_ids, true );
 
-            $collect_hierarchy( 0, $pages_by_parent, $ordered_ids, $collect_hierarchy );
+                if ( false !== $current_index ) {
+                    if ( $current_index > 0 && isset( $ordered_ids[ $current_index - 1 ] ) ) {
+                        $previous_page = get_post( $ordered_ids[ $current_index - 1 ] );
+                    }
 
-            $ordered_ids = array_values( array_unique( $ordered_ids ) );
-
-            $previous_page = null;
-            $next_page     = null;
-
-            $current_index = array_search( $current_id, $ordered_ids, true );
-
-            if ( false !== $current_index ) {
-                if ( $current_index > 0 && isset( $ordered_ids[ $current_index - 1 ] ) ) {
-                    $previous_page = get_post( $ordered_ids[ $current_index - 1 ] );
-                }
-
-                if ( isset( $ordered_ids[ $current_index + 1 ] ) ) {
-                    $next_page = get_post( $ordered_ids[ $current_index + 1 ] );
+                    if ( isset( $ordered_ids[ $current_index + 1 ] ) ) {
+                        $next_page = get_post( $ordered_ids[ $current_index + 1 ] );
+                    }
                 }
             }
 
