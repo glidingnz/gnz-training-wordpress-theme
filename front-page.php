@@ -1,9 +1,9 @@
 <?php get_header(); ?>
 
-<div class="container-lg px-3 px-md-4 px-lg-5 d-flex flex-column min-vh-100 justify-content-center">
-    <div class="hero-section py-5 text-center">
+<div class="container-lg px-3 px-md-4 px-lg-5 d-flex flex-column justify-content-center">
+    <div class="hero-section text-center mt-5">
         <!-- Search Bar -->
-        <div class="mx-auto my-4" style="max-width: 700px;">
+        <div class="mx-auto my-5" style="max-width: 700px;">
             <p class="h4 fw-bold primary-text mb-3 text-start ps-2">Welcome! Search for any topic...</p>
             <form role="search" method="get" class="search-form" action="<?php echo home_url( '/' ); ?>">
                 <div class="search-container bg-white rounded-4 shadow-sm">
@@ -20,7 +20,7 @@
 
     <!-- Info Grid -->
     <div class="row gy-5 gx-lg-5 pb-5">
-        <div class="col-12 col-lg-6">
+        <div class="col-12">
             <h2 class="h3 fw-bold primary-text border-bottom border-danger border-2 pb-2 d-inline-block mb-3">How to Use This Site</h2>
             <ul class="list-unstyled text-secondary d-flex flex-column gap-3">
                 <li class="d-flex align-items-start">
@@ -36,6 +36,17 @@
                     <span><strong>Track Progress:</strong> Consult your physical GNZ Logbook and Training Record card in conjunction with this material to track your real-world progress.</span>
                 </li>
             </ul>
+        </div>
+        <!-- Soaring journey image -->
+        <div class="col-12 col-lg-6">
+            <div class="overflow-hidden rounded-4">
+                <img
+                    src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/soaring-journey.jpg' ); ?>"
+                    class="img-fluid w-100 object-fit-cover"
+                    alt="Glider soaring above New Zealand landscape"
+                    loading="eager"
+                >
+            </div>
         </div>
         <div class="col-12 col-lg-6">
             <h2 class="h3 fw-bold primary-text border-bottom border-danger border-2 pb-2 d-inline-block mb-3">About the Program</h2>
