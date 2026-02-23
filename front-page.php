@@ -4,7 +4,7 @@
     <div class="hero-section text-center mt-5">
         <!-- Search Bar -->
         <div class="mx-auto my-5" style="max-width: 700px;">
-            <p class="h4 fw-bold primary-text mb-3 text-start ps-2">Welcome! Search for any topic...</p>
+            <p class="h4 fw-bold primary-text mb-3 text-start ps-2">Search for any topic...</p>
             <form role="search" method="get" class="search-form" action="<?php echo home_url( '/' ); ?>">
                 <div class="search-container bg-white rounded-4 shadow-sm">
                     <span class="search-icon-wrapper">
@@ -25,15 +25,15 @@
             <ul class="list-unstyled text-secondary d-flex flex-column gap-3">
                 <li class="d-flex align-items-start">
                     <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">1</span>
-                    <span><strong>Navigate by Stage:</strong> Use the menu to browse the syllabus chronologically. It's divided into 5 key stages, from Solo to Alpine.</span>
+                    <span><strong>Learn how the program works:</strong> Read <a href="/pilot/before/how/from">Before You Begin</a> to learn how to get the most from your instructors.</span>
                 </li>
                 <li class="d-flex align-items-start">
                     <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">2</span>
-                    <span><strong>Search Instantly:</strong> Looking for a specific procedure or rule? Use the search bar above to find pages across all syllabus levels instantly.</span>
+                    <span><strong>Navigate by Stage:</strong> Jump back in using the menu to browse the syllabus chronologically. It's divided into 5 key stages, from Solo to Alpine Pilot.</span>
                 </li>
                 <li class="d-flex align-items-start">
                     <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">3</span>
-                    <span><strong>Track Progress:</strong> Consult your physical GNZ Logbook and Training Record card in conjunction with this material to track your real-world progress.</span>
+                    <span><strong>Search Instantly:</strong> Looking for a specific procedure or rule? Use the search bar above to find pages across all syllabus levels instantly.</span>
                 </li>
             </ul>
         </div>
