@@ -4,7 +4,7 @@
     <?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
         
         <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-            <h1 class="display-5 fw-bold primary-text mb-4"><?php the_title(); ?></h1>
+            <h1 class="fw-bold primary-text border-bottom border-danger border-2 pb-2 d-inline-block mb-4"><?php the_title(); ?></h1>
             
             <!-- Breadcrumb-ish placeholder -->
             <p class="text-muted small border-bottom pb-3 mb-4">

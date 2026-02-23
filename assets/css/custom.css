@@ -321,6 +321,10 @@ body {
 }
 
 /* Typography */
+.entry-content h1 {
+    font-size: 2rem; /* equivalent to Bootstrap h2 */
+}
+
 h1,
 h2,
 h3,
