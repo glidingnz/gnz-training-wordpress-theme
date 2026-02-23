@@ -25,7 +25,7 @@
             <ul class="list-unstyled text-secondary d-flex flex-column gap-3">
                 <li class="d-flex align-items-start">
                     <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">1</span>
-                    <span><strong>Learn how the program works:</strong> Read <a href="/pilot/before/how/from">Before You Begin</a> to learn how to get the most from your instructors.</span>
+                    <span><strong>Learn how the program works:</strong> Read <a href="/pilot/before/how/">Before You Begin</a> to learn how to get the most from your instructors.</span>
                 </li>
                 <li class="d-flex align-items-start">
                     <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">2</span>
