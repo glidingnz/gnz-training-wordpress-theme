@@ -18,7 +18,7 @@
                 ?>
             </p>
 
-            <div class="entry-content text-secondary lh-lg">
+            <div class="entry-content text-secondary">
                 <?php the_content(); ?>
             </div>
 
