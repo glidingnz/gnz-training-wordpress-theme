@@ -78,6 +78,24 @@ function gnz_setup() {
 }
 add_action('after_setup_theme', 'gnz_setup');
 
+function gnz_send_csp_header() {
+    $policy = implode( '; ', array(
+        "default-src 'self'",
+        "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'",
+        "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com 'unsafe-inline'",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: https://placehold.co",
+        "connect-src 'self' https://cdn.jsdelivr.net",
+        "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "frame-ancestors 'self'",
+    ) );
+
+    header( 'Content-Security-Policy: ' . $policy );
+}
+add_action( 'send_headers', 'gnz_send_csp_header' );
+
 function gnz_get_highlight_terms() {
     if (!isset($_GET['highlight'])) {
         return array();
