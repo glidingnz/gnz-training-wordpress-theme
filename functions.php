@@ -259,6 +259,18 @@ function gnz_exclude_placeholder_pages_from_search($query) {
 }
 add_action('pre_get_posts', 'gnz_exclude_placeholder_pages_from_search');
 
+function gnz_exclude_empty_content_from_search( $where, $query ) {
+    if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() ) {
+        return $where;
+    }
+
+    global $wpdb;
+    $where .= " AND TRIM({$wpdb->posts}.post_content) != ''";
+
+    return $where;
+}
+add_filter( 'posts_where', 'gnz_exclude_empty_content_from_search', 10, 2 );
+
 function gnz_register_sidebar_meta_box() {
     add_meta_box(
         'gnz-sidebar-options',
