@@ -274,22 +274,22 @@ add_action('add_meta_boxes', 'gnz_register_sidebar_meta_box');
 function gnz_render_sidebar_meta_box($post) {
     wp_nonce_field('gnz_sidebar_meta_box', 'gnz_sidebar_meta_box_nonce');
 
-    $has_parent = wp_get_post_parent_id($post->ID);
+    $depth = count(get_post_ancestors($post->ID));
 
-    if ($has_parent) {
-        echo '<p class="description">' . esc_html__( 'Stage numbering can only be managed on top-level pages.', 'gliding-nz-training' ) . '</p>';
+    if (1 === $depth) {
+        $numbered = get_post_meta($post->ID, '_gnz_stage_numbered', true);
+        ?>
+        <p>
+            <label>
+                <input type="checkbox" name="gnz_stage_numbered" value="1" <?php checked('1', $numbered); ?> />
+                <?php esc_html_e('Enable stage numbering for this stage in the sidebar', 'gliding-nz-training'); ?>
+            </label>
+        </p>
+        <?php
         return;
     }
 
-    $disabled = get_post_meta($post->ID, '_gnz_disable_stage_numbers', true);
-    ?>
-    <p>
-        <label>
-            <input type="checkbox" name="gnz_disable_stage_numbers" value="1" <?php checked('1', $disabled); ?> />
-            <?php esc_html_e('Hide stage numbering for this section in the sidebar', 'gliding-nz-training'); ?>
-        </label>
-    </p>
-    <?php
+    echo '<p class="description">' . esc_html__( 'Stage numbering is controlled on individual stage pages.', 'gliding-nz-training' ) . '</p>';
 }
 
 function gnz_save_sidebar_meta_box($post_id) {
@@ -305,19 +305,19 @@ function gnz_save_sidebar_meta_box($post_id) {
         return;
     }
 
-    $is_top_level = !wp_get_post_parent_id($post_id);
+    $depth = count(get_post_ancestors($post_id));
 
-    if (!$is_top_level) {
-        delete_post_meta($post_id, '_gnz_disable_stage_numbers');
+    if (1 !== $depth) {
+        delete_post_meta($post_id, '_gnz_stage_numbered');
         return;
     }
 
-    $value = isset($_POST['gnz_disable_stage_numbers']) ? '1' : '';
+    $value = isset($_POST['gnz_stage_numbered']) ? '1' : '';
 
     if ('' === $value) {
-        delete_post_meta($post_id, '_gnz_disable_stage_numbers');
+        delete_post_meta($post_id, '_gnz_stage_numbered');
     } else {
-        update_post_meta($post_id, '_gnz_disable_stage_numbers', '1');
+        update_post_meta($post_id, '_gnz_stage_numbered', '1');
     }
 }
 add_action('save_post_page', 'gnz_save_sidebar_meta_box');

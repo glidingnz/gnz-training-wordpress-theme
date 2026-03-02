@@ -32,13 +32,6 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
     private $current_stage_open = false;
 
     /**
-     * Whether the current root item should display stage numbering.
-     *
-     * @var bool
-     */
-    private $current_stage_numbered = false;
-
-    /**
      * Cache of headings indexed by post ID.
      *
      * @var array<int, array<int, array<string, string>>>
@@ -170,9 +163,6 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
         if ( 0 === $depth ) {
             $this->stage_counter = 0;
 
-            $this->current_stage_numbered = in_array( 'enable-stage-numbers', $item_classes, true );
-            $this->current_stage_numbered = apply_filters( 'gnz_syllabus_stage_numbering_enabled', $this->current_stage_numbered, $item, $args );
-
             $is_active = in_array( 'current-menu-item', $item_classes, true ) || in_array( 'current-menu-ancestor', $item_classes, true );
             $classes = 'text-uppercase text-muted small fw-bold mt-5 px-2 text-decoration-none';
             $classes .= $is_active ? ' primary-text' : ' text-muted';
@@ -198,7 +188,12 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
         }
 
         if ( 1 === $depth ) {
-            if ( $this->current_stage_numbered ) {
+            $is_numbered = 'page' === $item->object && ! empty( $item->object_id )
+                ? get_post_meta( (int) $item->object_id, '_gnz_stage_numbered', true ) === '1'
+                : false;
+            $is_numbered = (bool) apply_filters( 'gnz_syllabus_stage_numbering_enabled', $is_numbered, $item, $args );
+
+            if ( $is_numbered ) {
                 $this->stage_counter++;
             }
 
@@ -211,7 +206,7 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
             $button_classes = 'stage-toggle w-100 d-flex align-items-center justify-content-between btn btn-link text-decoration-none px-2 py-2 primary-text';
             $number_classes = 'stage-number d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0';
 
-            if ( ! $this->current_stage_numbered ) {
+            if ( ! $is_numbered ) {
                 $button_classes .= ' no-stage-number';
             }
 
@@ -229,7 +224,7 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
             );
 
             $output .= '<span class="d-flex align-items-center text-start w-100">';
-            if ( $this->current_stage_numbered ) {
+            if ( $is_numbered ) {
                 $stage_number = apply_filters( 'gnz_syllabus_stage_number', $this->stage_counter, $item, $args );
 
                 $output .= sprintf(

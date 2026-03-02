@@ -117,12 +117,10 @@ class GNZ_Syllabus_Sidebar {
         $output  = "<div class=\"menu-root\">{$root_markup}</div>\n";
         $output .= "<div class=\"stages-container mt-3\">\n";
 
-        $stage_counter            = 0;
-        $stage_numbering_enabled  = self::is_stage_numbering_enabled( $root_page->ID, $root_page );
+        $stage_counter = 0;
 
         foreach ( $children as $child_page ) {
-            $stage_counter++;
-            $output .= self::render_stage( $child_page, $pages_by_parent, $current_id, $stage_counter, $stage_numbering_enabled, $root_page );
+            $output .= self::render_stage( $child_page, $pages_by_parent, $current_id, $stage_counter );
         }
 
         $output .= "</div>\n<hr />\n";
@@ -133,16 +131,14 @@ class GNZ_Syllabus_Sidebar {
     /**
      * Render a stage section.
      *
-     * @param WP_Post $stage_page              Stage page object.
-     * @param array   $pages_by_parent         Parent/child mapping.
-     * @param int     $current_id              Current page ID.
-     * @param int     $stage_counter           Current stage position.
-     * @param bool    $stage_numbering_enabled Whether numbering is enabled.
-     * @param WP_Post $root_page               Root page reference.
+     * @param WP_Post $stage_page      Stage page object.
+     * @param array   $pages_by_parent Parent/child mapping.
+     * @param int     $current_id      Current page ID.
+     * @param int     $stage_counter   Numbered-stage counter, incremented by reference when stage is numbered.
      *
      * @return string
      */
-    private static function render_stage( $stage_page, $pages_by_parent, $current_id, $stage_counter, $stage_numbering_enabled, $root_page ) {
+    private static function render_stage( $stage_page, $pages_by_parent, $current_id, &$stage_counter ) {
         if ( ! ( $stage_page instanceof WP_Post ) ) {
             return '';
         }
@@ -153,7 +149,10 @@ class GNZ_Syllabus_Sidebar {
         $button_class = 'stage-toggle w-100 d-flex align-items-center justify-content-between btn btn-link text-decoration-none px-2 py-2 primary-text';
         $number_class = 'stage-number d-inline-flex align-items-center justify-content-center me-3 flex-shrink-0';
 
-        if ( ! $stage_numbering_enabled ) {
+        $is_numbered = get_post_meta( $stage_id, '_gnz_stage_numbered', true ) === '1';
+        $is_numbered = (bool) apply_filters( 'gnz_syllabus_stage_numbering_enabled', $is_numbered, $stage_page, null );
+
+        if ( ! $is_numbered ) {
             $button_class .= ' no-stage-number';
         }
 
@@ -171,8 +170,9 @@ class GNZ_Syllabus_Sidebar {
         );
         $output .= '<span class="d-flex align-items-center text-start w-100">';
 
-        if ( $stage_numbering_enabled ) {
-            $stage_number = apply_filters( 'gnz_syllabus_stage_number', $stage_counter, $stage_page, $root_page );
+        if ( $is_numbered ) {
+            $stage_counter++;
+            $stage_number = apply_filters( 'gnz_syllabus_stage_number', $stage_counter, $stage_page, null );
             $output      .= sprintf(
                 '<span class="%1$s">%2$s</span>',
                 esc_attr( $number_class ),
@@ -306,24 +306,6 @@ class GNZ_Syllabus_Sidebar {
         $output .= '</div>';
 
         return $output;
-    }
-
-    /**
-     * Determine whether stage numbering is enabled for a root page.
-     *
-     * @param int $root_id Root page ID.
-     *
-     * @return bool
-     */
-    private static function is_stage_numbering_enabled( $root_id, $root_page = null ) {
-        $disabled = get_post_meta( $root_id, '_gnz_disable_stage_numbers', true ) === '1';
-        $enabled  = ! $disabled;
-
-        if ( null === $root_page ) {
-            $root_page = get_post( $root_id );
-        }
-
-        return (bool) apply_filters( 'gnz_syllabus_stage_numbering_enabled', $enabled, $root_page, null );
     }
 
     /**
