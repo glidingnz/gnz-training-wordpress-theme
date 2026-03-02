@@ -1,18 +1,28 @@
 <?php get_header(); ?>
 
 <div class="container-lg px-3 px-md-4 px-lg-5 d-flex flex-column justify-content-center">
-    <div class="hero-section text-center mt-5">
+    <div class="hero-section text-center mt-3 mt-lg-5">
+        <!-- Logo & Title -->
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="text-decoration-none d-inline-flex flex-column align-items-center flex-lg-row align-items-lg-end gap-lg-3 mb-5">
+            <img
+                src="<?php echo esc_url( get_theme_file_uri( '/assets/img/gnz-logo-text.png' ) ); ?>"
+                alt="<?php esc_attr_e( 'Gliding NZ Logo', 'gliding-nz-training' ); ?>"
+                style="max-height: 80px;"
+                class="img-fluid"
+            >
+            <span class="sidebar-program fs-3 mt-2 mt-lg-0"><?php esc_html_e( 'Pilot Training Program', 'gliding-nz-training' ); ?></span>
+        </a>
         <!-- Search Bar -->
-        <div class="mx-auto my-5" style="max-width: 700px;">
-            <p class="h4 fw-bold primary-text mb-3 text-start ps-2">Search for any topic...</p>
+        <div class="mx-auto mb-5" style="max-width: 700px;">
+            <p class="h6 fw-bold primary-text mb-2 text-start ps-2">Search for any topic...</p>
             <form role="search" method="get" class="search-form" action="<?php echo home_url( '/' ); ?>">
                 <div class="search-container bg-white rounded-4 shadow-sm">
                     <span class="search-icon-wrapper">
                         <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </span>
-                    <input type="search" class="search-input form-control rounded-4 fs-5" 
+                    <input type="search" class="search-input form-control rounded-4 fs-6" 
                            placeholder='Try "circuit" or "spins"...' 
-                           value="<?php echo get_search_query(); ?>" name="s" autofocus />
+                           value="<?php echo get_search_query(); ?>" name="s" id="hero-search" />
                 </div>
             </form>
         </div>

@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Auto-focus search on mobile (below Bootstrap lg breakpoint)
+    const heroSearch = document.getElementById('hero-search');
+    if (heroSearch && window.innerWidth >= 992) {
+        heroSearch.focus();
+    }
+
     const sidebar = document.getElementById('sidebar');
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const backdrop = document.getElementById('mobile-backdrop');
