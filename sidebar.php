@@ -3,7 +3,7 @@
         <!-- Logo Area -->
         <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="p-4 border-bottom d-flex flex-column align-items-center text-decoration-none">
             <img
-                src="<?php echo esc_url( get_theme_file_uri( '/assets/img/gnz-logo-thermal.png' ) ); ?>"
+                src="<?php echo esc_url( get_theme_file_uri( '/assets/img/gnz-logo-thermal-optimised.webp' ) ); ?>"
                 alt="<?php esc_attr_e( 'Gliding NZ Logo', 'gliding-nz-training' ); ?>"
                 style="max-height: 4rem;"
             >

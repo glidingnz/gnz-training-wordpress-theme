@@ -19,7 +19,7 @@
             </button>
             <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="text-decoration-none d-flex align-items-center">
             <img
-                src="https://gliding.co.nz/wp-content/uploads/2020/07/GNZ-Logo-Nov-2019-02-720x623.png"
+                src="<?php echo esc_url( get_theme_file_uri( '/assets/img/gnz-logo-thermal-optimised.webp' ) ); ?>"
                 onerror="this.onerror=null;this.src='https://placehold.co/200x80/C1272D/FFFFFF?text=GNZ';"
                 alt="<?php esc_attr_e( 'Gliding NZ Logo', 'gliding-nz-training' ); ?>"
                 class="me-2"

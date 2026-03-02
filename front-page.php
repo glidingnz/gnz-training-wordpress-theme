@@ -5,7 +5,7 @@
         <!-- Logo & Title -->
         <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="text-decoration-none d-inline-flex flex-column align-items-center flex-lg-row align-items-lg-end gap-lg-3 mb-5">
             <img
-                src="<?php echo esc_url( get_theme_file_uri( '/assets/img/gnz-logo-text.png' ) ); ?>"
+                src="<?php echo esc_url( get_theme_file_uri( '/assets/img/gnz-logo-text-optimised.webp' ) ); ?>"
                 alt="<?php esc_attr_e( 'Gliding NZ Logo', 'gliding-nz-training' ); ?>"
                 style="max-height: 80px;"
                 class="img-fluid"
@@ -51,7 +51,7 @@
         <div class="col-12 col-lg-6">
             <div class="overflow-hidden rounded-4">
                 <img
-                    src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/soaring-journey.jpg' ); ?>"
+                    src="<?php echo esc_url( get_template_directory_uri() . '/assets/img/soaring-journey-optimised.webp' ); ?>"
                     class="img-fluid w-100 object-fit-cover"
                     alt="Glider soaring above New Zealand landscape"
                     loading="eager"
