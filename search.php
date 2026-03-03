@@ -28,6 +28,8 @@ get_header();
         <?php endif; ?>
     </header>
 
+    <?php get_template_part( 'template-parts/search-bar' ); ?>
+
     <?php
     $search_terms = array();
 
