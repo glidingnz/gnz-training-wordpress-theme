@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 /**
  * Generates the syllabus sidebar navigation from the page hierarchy.
  *

@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <?php get_header(); ?>
 
 <div class="container-lg px-3 px-md-4 px-lg-5 d-flex flex-column justify-content-center">

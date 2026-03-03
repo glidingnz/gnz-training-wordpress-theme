@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <?php get_header(); ?>
 
 <div class="container-lg py-5 px-3 px-md-4 px-lg-5">
@@ -12,9 +13,9 @@
                 // Simple parent check
                 $parent_id = wp_get_post_parent_id( get_the_ID() );
                 if ( $parent_id ) {
-                    echo get_the_title( $parent_id ) . ' > ';
+                    echo esc_html( get_the_title( $parent_id ) ) . ' &gt; ';
                 }
-                the_title(); 
+                echo esc_html( get_the_title() ); 
                 ?>
             </p>
 

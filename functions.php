@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 require_once get_template_directory() . '/inc/class-gnz-syllabus-sidebar.php';
 
 function gnz_enqueue_scripts() {
@@ -92,6 +94,10 @@ function gnz_send_csp_header() {
     ) );
 
     header( 'Content-Security-Policy: ' . $policy );
+    header( 'X-Content-Type-Options: nosniff' );
+    header( 'X-Frame-Options: SAMEORIGIN' );
+    header( 'Referrer-Policy: strict-origin-when-cross-origin' );
+    header( 'Permissions-Policy: camera=(), microphone=(), geolocation=()' );
 }
 add_action( 'send_headers', 'gnz_send_csp_header' );
 
@@ -100,7 +106,7 @@ function gnz_get_highlight_terms() {
         return array();
     }
 
-    $raw_value = wp_unslash((string) $_GET['highlight']);
+    $raw_value = substr( wp_unslash( (string) $_GET['highlight'] ), 0, 200 );
     $normalized_value = preg_replace('/\s+/u', ' ', $raw_value);
 
     if (null === $normalized_value) {
@@ -121,8 +127,9 @@ function gnz_get_highlight_terms() {
 
     $parts = array_map('sanitize_text_field', $parts);
     $parts = array_filter(array_map('trim', $parts));
+    $parts = array_slice( array_values( array_unique( $parts ) ), 0, 10 );
 
-    return array_values(array_unique($parts));
+    return array_values( $parts );
 }
 
 function gnz_highlight_terms_in_content($content) {

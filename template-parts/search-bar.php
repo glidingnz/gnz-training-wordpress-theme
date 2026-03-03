@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
     <div class="search-container bg-white rounded-4 shadow-sm">
         <span class="search-icon-wrapper">

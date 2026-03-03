@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 /**
  * Search zone: label row, search form, and collapsible tips panel.
  *

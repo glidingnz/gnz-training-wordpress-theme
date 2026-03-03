@@ -1,4 +1,6 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
 /**
  * Custom walker to render the syllabus sidebar navigation.
  *

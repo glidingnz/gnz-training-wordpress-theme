@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <?php get_header(); ?>
 
 <div class="container py-5 text-center">

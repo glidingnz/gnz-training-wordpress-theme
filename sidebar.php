@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <div id="sidebar" class="d-flex flex-column bg-white border-end sidebar-collapsed">
     <div class="sidebar-inner-content d-flex flex-column flex-grow-1">
         <!-- Logo Area -->
