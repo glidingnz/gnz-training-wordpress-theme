@@ -13,7 +13,7 @@
             <span class="sidebar-program fs-3 mt-2 mt-lg-0"><?php esc_html_e( 'Pilot Training Program', 'gliding-nz-training' ); ?></span>
         </a>
         <!-- Search Bar -->
-        <?php get_template_part( 'template-parts/search-bar' ); ?>
+        <?php get_template_part( 'template-parts/search-zone', null, array( 'mb_class' => 'mb-5' ) ); ?>
     </div>
 
     <!-- Info Grid -->

@@ -227,4 +227,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncActiveTopicHeading();
     window.addEventListener('hashchange', syncActiveTopicHeading);
+
+    // Search tips toggle (no Bootstrap JS required)
+    const searchTipsToggle = document.getElementById('gnz-search-tips-toggle');
+    const searchTipsPanel  = document.getElementById('gnz-search-tips');
+    if (searchTipsToggle && searchTipsPanel) {
+        searchTipsToggle.addEventListener('click', () => {
+            const expanded = searchTipsPanel.classList.toggle('show');
+            searchTipsToggle.setAttribute('aria-expanded', String(expanded));
+        });
+    }
 });

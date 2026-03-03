@@ -4,17 +4,16 @@ require_once get_template_directory() . '/inc/class-gnz-syllabus-sidebar.php';
 function gnz_enqueue_scripts() {
     // Bootstrap 5
     wp_enqueue_style('bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css', array(), '5.3.2');
-    wp_enqueue_script('bootstrap-bundle', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js', array(), '5.3.2', true);
 
     // Google Fonts: Inter
     wp_enqueue_style('google-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap', array(), null);
 
     // Theme Styles
-    wp_enqueue_style('gnz-style', get_template_directory_uri() . '/assets/css/custom.css', array('bootstrap'), '1.0.0');
+    wp_enqueue_style('gnz-style', get_template_directory_uri() . '/assets/css/custom.css', array('bootstrap'), filemtime( get_template_directory() . '/assets/css/custom.css' ) );
     wp_enqueue_style('gnz-main-style', get_stylesheet_uri(), array('gnz-style'), '1.0.0');
 
     // Theme Scripts
-    wp_enqueue_script('gnz-script', get_template_directory_uri() . '/assets/js/main.js', array('bootstrap-bundle'), '1.0.0', true);
+    wp_enqueue_script('gnz-script', get_template_directory_uri() . '/assets/js/main.js', array(), '1.0.0', true);
 
     $pass_banner_css = gnz_get_pass_banner_styles();
 
@@ -288,6 +287,56 @@ function gnz_exclude_empty_content_from_search( $where, $query ) {
     return $where;
 }
 add_filter( 'posts_where', 'gnz_exclude_empty_content_from_search', 10, 2 );
+
+/**
+ * Replace WordPress's default partial/OR word search with either:
+ *  - exact phrase matching (LIKE) for multi-word queries, or
+ *  - whole-word matching (REGEXP) for single-word queries.
+ *
+ * Also updates the search_terms query var so snippet extraction and
+ * <mark> highlighting in search.php stay accurate.
+ */
+function gnz_improved_search_sql( $search, $query ) {
+    if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() ) {
+        return $search;
+    }
+
+    $raw = trim( get_search_query( false ) );
+
+    if ( '' === $raw ) {
+        return $search;
+    }
+
+    global $wpdb;
+
+    $is_phrase = (bool) preg_match( '/\s/u', $raw );
+
+    if ( $is_phrase ) {
+        // Multi-word: require the exact phrase to appear in title or content.
+        $like   = '%' . $wpdb->esc_like( $raw ) . '%';
+        $search = $wpdb->prepare(
+            " AND ({$wpdb->posts}.post_title LIKE %s OR {$wpdb->posts}.post_content LIKE %s)",
+            $like,
+            $like
+        );
+        $query->set( 'search_terms', array( $raw ) );
+    } else {
+        // Single word: match whole words only.
+        // Uses a character-class boundary compatible with MySQL 8.0's ICU REGEXP engine.
+        // Escape MySQL REGEXP metacharacters in the search term.
+        $escaped = preg_replace( '/([.+*?\[^\]$(){}=!<>|:\\\\#-])/', '\\\\$1', $raw );
+        $regexp  = '(^|[^a-zA-Z0-9])' . $escaped . '([^a-zA-Z0-9]|$)';
+        $search  = $wpdb->prepare(
+            " AND ({$wpdb->posts}.post_title REGEXP %s OR {$wpdb->posts}.post_content REGEXP %s)",
+            $regexp,
+            $regexp
+        );
+        $query->set( 'search_terms', array( $raw ) );
+    }
+
+    return $search;
+}
+add_filter( 'posts_search', 'gnz_improved_search_sql', 10, 2 );
 
 function gnz_register_sidebar_meta_box() {
     add_meta_box(

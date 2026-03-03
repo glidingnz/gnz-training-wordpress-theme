@@ -3,32 +3,29 @@ get_header();
 ?>
 
 <div class="container-lg py-5 px-3 px-md-4 px-lg-5">
-    <header class="mb-5 text-center text-md-start">
+    <header class="mb-4 text-center text-md-start">
         <p class="text-uppercase text-secondary fw-semibold small mb-2"><?php esc_html_e( 'Search', 'gliding-nz-training' ); ?></p>
-        <h1 class="display-6 fw-bold primary-text mb-3">
-            <?php printf(
-                /* translators: %s: search query */
-                esc_html__( 'Results for "%s"', 'gliding-nz-training' ),
-                esc_html( get_search_query() )
-            ); ?>
-        </h1>
         <?php
         global $wp_query;
         $total_results = (int) $wp_query->found_posts;
-        if ( $total_results > 0 ) :
-            $count_label = sprintf(
-                /* translators: %s: total number of results */
-                _n( '%s result found', '%s results found', $total_results, 'gliding-nz-training' ),
-                number_format_i18n( $total_results )
-            );
-            ?>
-            <p class="text-secondary mb-0"><?php echo esc_html( $count_label ); ?></p>
+        if ( $total_results > 0 ) : ?>
+            <h1 class="fs-3 fw-bold primary-text mb-0"><?php printf(
+                /* translators: 1: number of results, 2: search query */
+                esc_html( _n( '%1$s result for "%2$s"', '%1$s results for "%2$s"', $total_results, 'gliding-nz-training' ) ),
+                esc_html( number_format_i18n( $total_results ) ),
+                esc_html( get_search_query() )
+            ); ?></h1>
         <?php else : ?>
-            <p class="text-secondary mb-0"><?php esc_html_e( 'No matching pages were found. Try another search term below.', 'gliding-nz-training' ); ?></p>
+            <h1 class="fs-3 fw-bold primary-text mb-0"><?php printf(
+                /* translators: %s: search query */
+                esc_html__( 'No results for "%s"', 'gliding-nz-training' ),
+                esc_html( get_search_query() )
+            ); ?></h1>
+            <p class="text-secondary mb-0 mt-2"><?php esc_html_e( 'Try a different search term below.', 'gliding-nz-training' ); ?></p>
         <?php endif; ?>
     </header>
 
-    <?php get_template_part( 'template-parts/search-bar' ); ?>
+    <?php get_template_part( 'template-parts/search-zone' ); ?>
 
     <?php
     $search_terms = array();
@@ -72,7 +69,7 @@ get_header();
             return $escaped_text;
         }
 
-        $pattern = '/(' . implode( '|', $escaped_terms ) . ')/iu';
+        $pattern = '/\b(' . implode( '|', $escaped_terms ) . ')\b/iu';
         $highlighted = preg_replace( $pattern, '<mark class="search-highlight">$1</mark>', $escaped_text );
 
         if ( null === $highlighted ) {
@@ -122,8 +119,9 @@ get_header();
                     continue;
                 }
 
-                $lower_term = function_exists( 'mb_strtolower' ) ? mb_strtolower( $term ) : strtolower( $term );
-                $score     += substr_count( $lower_sentence, $lower_term );
+                $lower_term  = function_exists( 'mb_strtolower' ) ? mb_strtolower( $term ) : strtolower( $term );
+                $match_count = preg_match_all( '/\b' . preg_quote( $lower_term, '/' ) . '\b/iu', $lower_sentence );
+                $score      += ( false === $match_count ) ? 0 : $match_count;
             }
 
             if ( $score <= 0 ) {
@@ -256,7 +254,14 @@ get_header();
                 ?>
                 <a href="<?php echo esc_url( $permalink_for_card ); ?>" class="<?php echo esc_attr( $classes ); ?>" id="<?php echo esc_attr( $anchor_id ); ?>" role="article">
                     <div class="w-100">
-                        <h2 class="h4 fw-bold primary-text mb-3"><?php echo esc_html( get_the_title( $post_id ) ); ?></h2>
+                        <?php
+                        $ancestors = array_reverse( get_post_ancestors( $post_id ) );
+                        if ( ! empty( $ancestors ) ) :
+                            $crumbs = array_map( static function( $id ) { return esc_html( get_the_title( $id ) ); }, $ancestors );
+                            ?>
+                            <p class="small text-secondary mb-1 lh-sm"><?php echo implode( ' <span aria-hidden="true">›</span> ', $crumbs ); ?></p>
+                        <?php endif; ?>
+                        <h2 class="h4 fw-bold primary-text mb-3"><?php echo $highlight_text( get_the_title( $post_id ) ); ?></h2>
                         <?php foreach ( $snippets as $index => $snippet ) :
                             $paragraph_class = $index === ( $snippet_count - 1 ) ? ' mb-0' : ' mb-2';
                             ?>
@@ -270,26 +275,8 @@ get_header();
         <?php the_posts_pagination( array(
             'prev_text' => esc_html__( 'Previous', 'gliding-nz-training' ),
             'next_text' => esc_html__( 'Next', 'gliding-nz-training' ),
-            'class'     => 'pagination justify-content-center'
+            'class'     => 'gnz-pagination',
         ) ); ?>
-    <?php else : ?>
-        <div class="bg-white p-4 rounded-4 shadow-sm">
-            <form role="search" method="get" class="search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-                <div class="search-container position-relative bg-white rounded-4 shadow-sm">
-                    <input
-                        type="search"
-                        class="search-input form-control border-0 rounded-4 py-3 ps-5 fs-5"
-                        placeholder='<?php echo esc_attr__( 'Try "spins," "HASELL," or "thermal entry"...', 'gliding-nz-training' ); ?>'
-                        value="<?php echo esc_attr( get_search_query() ); ?>"
-                        name="s"
-                        autofocus
-                    />
-                    <svg class="search-icon position-absolute" style="left: 1.5rem; top: 50%; transform: translateY(-50%); width: 1.5rem; height: 1.5rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </div>
-            </form>
-        </div>
     <?php endif; ?>
 </div>
 
