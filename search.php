@@ -196,6 +196,84 @@ get_header();
         return array_values( array_unique( $snippets ) );
     };
 
+    // Build a depth-first ordered map of post_id => position, mirroring the PTP
+    // sidebar's menu_order traversal, so results appear in syllabus order.
+    $all_pages = get_pages( array(
+        'sort_column' => 'menu_order,post_title',
+        'post_status' => 'publish',
+        'number'      => 0,
+    ) );
+
+    $ptp_pages_by_parent = array();
+    foreach ( $all_pages as $_p ) {
+        $ptp_pages_by_parent[ (int) $_p->post_parent ][] = $_p;
+    }
+    foreach ( $ptp_pages_by_parent as &$_group ) {
+        usort( $_group, static function ( $a, $b ) {
+            if ( $a->menu_order === $b->menu_order ) {
+                return strcasecmp( $a->post_title, $b->post_title );
+            }
+            return $a->menu_order <=> $b->menu_order;
+        } );
+    }
+    unset( $_group );
+
+    $ptp_order = array();
+    $ptp_position = 0;
+    $ptp_stack = isset( $ptp_pages_by_parent[0] ) ? $ptp_pages_by_parent[0] : array();
+    while ( ! empty( $ptp_stack ) ) {
+        $_page = array_shift( $ptp_stack );
+        $ptp_order[ (int) $_page->ID ] = $ptp_position++;
+        if ( isset( $ptp_pages_by_parent[ (int) $_page->ID ] ) ) {
+            $ptp_stack = array_merge( $ptp_pages_by_parent[ (int) $_page->ID ], $ptp_stack );
+        }
+    }
+    unset( $all_pages, $ptp_pages_by_parent, $ptp_stack, $_page, $ptp_position );
+
+    // Fetch ALL matching IDs (no pagination) so we can sort globally, then
+    // re-paginate from that sorted list.
+    $all_ids_query = new WP_Query( array(
+        's'              => get_search_query(),
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+        'no_found_rows'  => true,
+    ) );
+
+    $all_sorted_ids = is_array( $all_ids_query->posts ) ? $all_ids_query->posts : array();
+    unset( $all_ids_query );
+
+    usort( $all_sorted_ids, static function ( $a, $b ) use ( $ptp_order ) {
+        $pos_a = isset( $ptp_order[ (int) $a ] ) ? $ptp_order[ (int) $a ] : PHP_INT_MAX;
+        $pos_b = isset( $ptp_order[ (int) $b ] ) ? $ptp_order[ (int) $b ] : PHP_INT_MAX;
+        return $pos_a <=> $pos_b;
+    } );
+
+    // Slice out the correct page from the globally sorted list, then fetch
+    // the full post objects for exactly those IDs in the correct order.
+    if ( ! empty( $all_sorted_ids ) ) {
+        $posts_per_page = (int) get_option( 'posts_per_page' );
+        $current_page   = max( 1, (int) get_query_var( 'paged' ) ?: 1 );
+        $page_ids       = array_slice( $all_sorted_ids, ( $current_page - 1 ) * $posts_per_page, $posts_per_page );
+
+        if ( ! empty( $page_ids ) ) {
+            $page_query = new WP_Query( array(
+                'post_type'      => 'any',
+                'post_status'    => 'publish',
+                'post__in'       => $page_ids,
+                'orderby'        => 'post__in',
+                'posts_per_page' => count( $page_ids ),
+                'no_found_rows'  => true,
+            ) );
+
+            $wp_query->posts = $page_query->posts;
+            $wp_query->rewind_posts();
+            unset( $page_query );
+        }
+        unset( $page_ids );
+    }
+    unset( $all_sorted_ids );
+
     if ( have_posts() ) :
         ?>
         <div class="list-group mb-4">
@@ -208,8 +286,7 @@ get_header();
                 $raw_content = get_post_field( 'post_content', $post_id );
                 $excerpt     = get_the_excerpt( $post_id );
 
-                $combined_source = $excerpt ? $excerpt . ' ' . $raw_content : $raw_content;
-                $snippets        = $collect_snippets( $combined_source, $search_terms, 3 );
+                $snippets = $collect_snippets( $raw_content, $search_terms, 3 );
 
                 if ( empty( $snippets ) ) {
                     if ( empty( $excerpt ) ) {

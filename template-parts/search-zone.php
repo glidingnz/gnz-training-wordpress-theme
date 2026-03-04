@@ -30,10 +30,11 @@ $mb_class = ( ! empty( $args['mb_class'] ) && is_string( $args['mb_class'] ) )
     <div class="collapse mt-2" id="gnz-search-tips">
         <div class="bg-white rounded-4 shadow-sm px-4 py-3">
             <ul class="mb-0 small text-secondary ps-3">
-                <li class="mb-2"><strong><?php esc_html_e( 'Multiple words', 'gliding-nz-training' ); ?></strong> &mdash; <?php esc_html_e( 'treated as an exact phrase. For example, searching', 'gliding-nz-training' ); ?> <em><?php esc_html_e( 'spin training', 'gliding-nz-training' ); ?></em> <?php esc_html_e( 'only returns pages where those two words appear together in that order.', 'gliding-nz-training' ); ?></li>
-                <li class="mb-2"><strong><?php esc_html_e( 'Single word', 'gliding-nz-training' ); ?></strong> &mdash; <?php esc_html_e( 'matched as a whole word only. Searching', 'gliding-nz-training' ); ?> <em><?php esc_html_e( 'spin', 'gliding-nz-training' ); ?></em> <?php esc_html_e( "won't return pages that merely contain the letters \"spin\" inside another word.", 'gliding-nz-training' ); ?></li>
-                <li class="mb-2"><?php esc_html_e( "If you're not finding what you expect, try a shorter phrase or a single key word.", 'gliding-nz-training' ); ?></li>
-                <li class="mb-0 text-body-tertiary"><?php esc_html_e( 'Occasionally a page may appear because a word matches an image filename or other embedded content rather than the visible text.', 'gliding-nz-training' ); ?></li>
+                <li class="mb-2">Multiple words are treated as an exact phrase. For example, searching <i>spin training</i> only returns pages where those two words appear together in that order.</li>
+                <li class="mb-2">Single words match as a whole word only. Searching <i>spin</i> won't return pages that merely contain the letters "spin" inside another word.</li>
+                <li class="mb-2">If you're not finding what you expect, try a shorter phrase or a single key word.</li>
+                <li class="mb-2">Results are sorted in the order they appear in the Pilot Training Program.</li>
+                <li class="mb-0 text-body-tertiary">Matches include image filenames - results may include pages with no matching visible text.</li>
             </ul>
         </div>
     </div>
