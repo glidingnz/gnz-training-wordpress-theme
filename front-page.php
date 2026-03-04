@@ -36,7 +36,7 @@
                 </li>
                 <li class="d-flex align-items-start">
                     <span class="badge rounded-circle primary-bg text-white d-flex align-items-center justify-content-center me-3 mt-1" style="width: 24px; height: 24px;">4</span>
-                    <span><strong>Send Feedback:</strong> Found something missing or incorrect? Email <a href="mailto:webmaster@gliding.co.nz">webmaster@gliding.co.nz</a> with your feedback. The old PTP site at <a href="http://training.gliding.co.nz">training.gliding.co.nz</a> will remain available until the end of June 2026.</span>
+                    <span><strong>Send Feedback:</strong> Found something missing or incorrect? Email <a href="mailto:webmaster@gliding.co.nz">webmaster@gliding.co.nz</a> with your feedback. The old PTP site at <a href="http://old-training.gliding.co.nz">old-training.gliding.co.nz</a> will remain available until the end of June 2026.</span>
                 </li>
             </ul>
         </div>
