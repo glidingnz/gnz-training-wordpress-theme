@@ -1,0 +1,28 @@
+{
+  "name": "gliding-nz-training",
+  "version": "1.0.0",
+  "description": "This Classic Wordpress theme was created for GNZ's training syllabus website. I first used Gemini 3 Pro to build a wireframe (because I suck at design), then used GPT-5-Codex and Claude Sonnet 4.6 to build this theme and iterate on the UX (with some professional supervision and manual tweaks).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:update-snapshots": "playwright test --update-snapshots"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glidingnz/gnz-training-wordpress-theme.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/glidingnz/gnz-training-wordpress-theme/issues"
+  },
+  "homepage": "https://github.com/glidingnz/gnz-training-wordpress-theme#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

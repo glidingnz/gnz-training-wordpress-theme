@@ -8,7 +8,7 @@ This is a Wordpress theme used to host Gliding New Zealand's Pilot Training Prog
 
 # Testing
 
-The site runs at `http://localhost:8000`. You can use the browser's developer tools to inspect the site and test changes. For testing PHP code, you can use the command line as described below.
+The site runs at `http://localhost:8080`. You can use the browser's developer tools to inspect the site and test changes. For testing PHP code, you can use the command line as described below.
 
 # Project general coding standards
 

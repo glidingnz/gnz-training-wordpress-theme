@@ -1,1 +1,6 @@
 .vscode
+node_modules/
+playwright-report/
+test-results/
+# Snapshots are committed so diffs are tracked in version control
+# tests/snapshots/
