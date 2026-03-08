@@ -237,4 +237,12 @@ document.addEventListener('DOMContentLoaded', () => {
             searchTipsToggle.setAttribute('aria-expanded', String(expanded));
         });
     }
+
+    // Scroll to first search highlight if arriving from a search result
+    if (new URLSearchParams(window.location.search).has('highlight')) {
+        const firstMark = document.querySelector('mark.search-highlight');
+        if (firstMark) {
+            firstMark.scrollIntoView({ block: 'center' });
+        }
+    }
 });

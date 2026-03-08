@@ -119,17 +119,16 @@ function gnz_get_highlight_terms() {
         return array();
     }
 
-    $parts = preg_split('/\s+/u', $normalized, -1, PREG_SPLIT_NO_EMPTY);
+    // Multi-word queries are treated as an exact phrase (matching the search
+    // engine behaviour documented in template-parts/search-zone.php), so keep
+    // the whole normalised string as a single term rather than splitting it.
+    $phrase = sanitize_text_field( $normalized );
 
-    if (false === $parts || empty($parts)) {
+    if ( '' === $phrase ) {
         return array();
     }
 
-    $parts = array_map('sanitize_text_field', $parts);
-    $parts = array_filter(array_map('trim', $parts));
-    $parts = array_slice( array_values( array_unique( $parts ) ), 0, 10 );
-
-    return array_values( $parts );
+    return array( $phrase );
 }
 
 function gnz_highlight_terms_in_content($content) {
