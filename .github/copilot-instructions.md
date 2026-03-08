@@ -10,6 +10,16 @@ This is a Wordpress theme used to host Gliding New Zealand's Pilot Training Prog
 
 The site runs at `http://localhost:8080`. You can use the browser's developer tools to inspect the site and test changes. For testing PHP code, you can use the command line as described below.
 
+## Playwright
+
+Playwright is configured with the `html` reporter, which automatically starts a local web server to display results after a test run. This causes the process to hang indefinitely in an agent context. Always pass `--reporter=line` when running Playwright tests so the process exits cleanly:
+
+```bash
+npx playwright test --reporter=line
+```
+
+Never run with `--update-snapshots` unless the user has explicitly asked you to update the visual baselines. Running it without permission silently overwrites the reference images, defeating the purpose of regression testing.
+
 # Project general coding standards
 
 - Don't make any big assumptions about design/functionality. The user prefers clarifying questions.
