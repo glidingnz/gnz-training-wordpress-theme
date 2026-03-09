@@ -147,6 +147,13 @@ function gnz_highlight_terms_in_content($content) {
     foreach ($terms as $term) {
         $term = preg_quote($term, '/');
 
+        // After preg_quote, straight apostrophes are preserved as-is.
+        // WordPress's wptexturize (priority 10) converts them to HTML
+        // entities (&#8217;/&#8216;) before this filter runs (priority 20),
+        // so we broaden straight apostrophes into an alternation that
+        // matches the entity, the raw UTF-8 character, or the original.
+        $term = str_replace("'", "(?:'|&#821[67];|\x{2018}|\x{2019})", $term);
+
         if ('' !== $term) {
             $escaped_terms[] = $term;
         }

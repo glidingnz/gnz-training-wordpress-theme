@@ -76,6 +76,29 @@ test.describe('Search highlight – single word', () => {
     });
 });
 
+test.describe('Search highlight – apostrophe handling', () => {
+    test('query with straight apostrophe highlights text curly-quoted by WordPress', async ({ page }) => {
+        await page.goto('/');
+        await page.waitForLoadState('domcontentloaded');
+        await submitSearch(page, "I'M SAFE");
+        await clickFirstResult(page);
+
+        expect(page.url()).toContain('highlight=');
+
+        const marks = page.locator('mark.search-highlight');
+        await expect(marks.first()).toBeVisible();
+
+        const count = await marks.count();
+        for (let i = 0; i < count; i++) {
+            const text = ((await marks.nth(i).textContent()) ?? '').toLowerCase();
+            // WordPress converts straight apostrophes to curly (right single
+            // quotation mark U+2019), so accept either variant.
+            const normalised = text.replace(/\u2019/g, "'");
+            expect(normalised).toContain("i'm safe");
+        }
+    });
+});
+
 test.describe('Search highlight – scroll to first match', () => {
     test('first highlighted mark is in the viewport after following a search result', async ({ page }) => {
         await page.goto('/');

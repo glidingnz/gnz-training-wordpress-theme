@@ -64,7 +64,15 @@ get_header();
                 continue;
             }
 
-            $escaped_terms[] = preg_quote( esc_html( $term ), '/' );
+            $escaped = preg_quote( esc_html( $term ), '/' );
+
+            // esc_html() turns a straight apostrophe into &#039; but
+            // wptexturize (applied to titles) produces &#8217; that
+            // esc_html() leaves unchanged. Match any apostrophe variant
+            // so highlighting works for both snippets and titles.
+            $escaped = str_replace( '&#039;', '(?:&#039;|&#821[67];|\'|\x{2018}|\x{2019})', $escaped );
+
+            $escaped_terms[] = $escaped;
         }
 
         if ( empty( $escaped_terms ) ) {
