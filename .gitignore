@@ -4,3 +4,5 @@ playwright-report/
 test-results/
 # Snapshots are committed so diffs are tracked in version control
 # tests/snapshots/
+vendor/
+composer.phar

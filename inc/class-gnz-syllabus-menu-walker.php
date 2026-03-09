@@ -154,7 +154,7 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
      * Starts the element output.
      *
      * @param string   $output Used to append additional content (passed by reference).
-     * @param WP_Post  $item   Menu item data object.
+     * @param mixed    $item   Nav menu item (WP_Post with nav menu properties applied by wp_setup_nav_menu_item()).
      * @param int      $depth  Depth of menu item. Used for padding.
      * @param stdClass $args   An object of wp_nav_menu() arguments.
      * @param int      $id     Current item ID.
@@ -338,10 +338,9 @@ class GNZ_Syllabus_Menu_Walker extends Walker_Nav_Menu {
      * Ends the element output, if needed.
      *
      * @param string   $output Used to append additional content (passed by reference).
-     * @param WP_Post  $item   Page data object. Not used.
-     * @param int      $depth  Depth of page. Not Used.
+     * @param mixed    $item   Nav menu item (WP_Post with nav menu properties applied). Not used.
+     * @param int      $depth  Depth of menu item. Not used.
      * @param stdClass $args   An object of wp_nav_menu() arguments.
-     * @param int      $id     Current item ID.
      */
     public function end_el( &$output, $item, $depth = 0, $args = null ) {
         if ( 1 === $depth ) {

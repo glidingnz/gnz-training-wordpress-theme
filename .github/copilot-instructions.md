@@ -34,3 +34,23 @@ We're using Docker Compose, so use the following command structure to run PHP co
 ```bash
 docker compose -f ../../../../docker-compose.yml exec wordpress sh -c "php -i"
 ```
+
+# Static analysis (PHPStan)
+
+PHPStan is configured at level 5 targeting PHP 8.3 with WordPress stubs (`szepeviktor/phpstan-wordpress`). Run it via:
+
+```bash
+npm run analyse
+```
+
+This runs PHPStan inside the WordPress Docker container where the PHP version matches production. Run this after any PHP changes to catch type errors and deprecations before they hit runtime. `composer.phar` and `vendor/` are gitignored; to restore them on a fresh clone:
+
+```bash
+# Download Composer into the theme directory
+docker compose -f ../../../../docker-compose.yml exec -e COMPOSER_HOME=/tmp/composer wordpress sh -c \
+  "curl -sS https://getcomposer.org/installer | php -- --install-dir=/var/www/html/wp-content/themes/gliding-nz-training --filename=composer.phar"
+
+# Install PHPStan and WordPress stubs
+docker compose -f ../../../../docker-compose.yml exec -e COMPOSER_HOME=/tmp/composer wordpress sh -c \
+  "cd /var/www/html/wp-content/themes/gliding-nz-training && php composer.phar install && php composer.phar dump-autoload"
+```
