@@ -151,6 +151,54 @@ test.describe('Search – phrase match precision (substring regression)', () => 
     });
 });
 
+test.describe('Search – snippet shows matching phrase (truncation regression)', () => {
+    /**
+     * Regression: when the matching phrase appeared late in a long "sentence"
+     * (e.g. a run of list-items merged into one text block), the 240-char
+     * truncation took from the start and cut off the actual match.  The
+     * snippet should now centre its window around the first match.
+     *
+     * "rules of the air" on the Soaring Techniques page sits at character
+     * ~375 of a ~420-char sentence, so the old logic dropped it entirely.
+     */
+    test('snippet for "rules of the air" on Soaring Techniques contains the phrase', async ({ page }) => {
+        await page.goto('/?s=rules+of+the+air');
+        await page.waitForLoadState('domcontentloaded');
+
+        // Find the Soaring Techniques result card
+        const cards = page.locator('a[role="article"]');
+        const cardCount = await cards.count();
+        let found = false;
+
+        for (let i = 0; i < cardCount; i++) {
+            const title = await cards.nth(i).locator('h2').textContent() ?? '';
+            if (!title.toLowerCase().includes('soaring techniques')) continue;
+
+            // Check the preview snippets inside this card
+            const snippets = cards.nth(i).locator('p.text-secondary');
+            const snippetCount = await snippets.count();
+            let phraseVisible = false;
+
+            for (let j = 0; j < snippetCount; j++) {
+                const text = ((await snippets.nth(j).textContent()) ?? '').toLowerCase();
+                if (text.includes('rules of the air')) {
+                    phraseVisible = true;
+                    break;
+                }
+            }
+
+            expect(
+                phraseVisible,
+                'Soaring Techniques snippet must contain "rules of the air"'
+            ).toBe(true);
+            found = true;
+            break;
+        }
+
+        expect(found, '"Soaring Techniques" result card not found').toBe(true);
+    });
+});
+
 test.describe('Search highlight – apostrophe handling', () => {
     test('query with straight apostrophe highlights text curly-quoted by WordPress', async ({ page }) => {
         await page.goto('/');

@@ -150,8 +150,56 @@ get_header();
             $sentence_length = function_exists( 'mb_strlen' ) ? mb_strlen( $sentence ) : strlen( $sentence );
 
             if ( $sentence_length > 240 ) {
-                $trimmed = function_exists( 'mb_substr' ) ? mb_substr( $sentence, 0, 237 ) : substr( $sentence, 0, 237 );
-                $sentence = rtrim( (string) $trimmed ) . '…';
+                // Centre the window around the first matching term so
+                // the reader sees the relevant context, not just the
+                // start of a very long run of text.
+                $match_pos = false;
+                foreach ( $terms as $t ) {
+                    $t = trim( (string) $t );
+                    if ( '' === $t ) {
+                        continue;
+                    }
+                    $pos = function_exists( 'mb_stripos' ) ? mb_stripos( $sentence, $t ) : stripos( $sentence, $t );
+                    if ( false !== $pos ) {
+                        $match_pos = $pos;
+                        break;
+                    }
+                }
+
+                if ( false !== $match_pos ) {
+                    $term_len  = function_exists( 'mb_strlen' ) ? mb_strlen( (string) $t ) : strlen( (string) $t );
+                    $window    = 240;
+                    $start     = max( 0, $match_pos - (int) ( ( $window - $term_len ) / 2 ) );
+                    $end       = $start + $window;
+
+                    if ( $end > $sentence_length ) {
+                        $end   = $sentence_length;
+                        $start = max( 0, $end - $window );
+                    }
+
+                    $snippet  = function_exists( 'mb_substr' ) ? mb_substr( $sentence, $start, $end - $start ) : substr( $sentence, $start, $end - $start );
+
+                    // Try to break at word boundaries.
+                    if ( $start > 0 ) {
+                        $first_space = function_exists( 'mb_strpos' ) ? mb_strpos( $snippet, ' ' ) : strpos( $snippet, ' ' );
+                        if ( false !== $first_space && $first_space < 30 ) {
+                            $snippet = function_exists( 'mb_substr' ) ? mb_substr( $snippet, $first_space + 1 ) : substr( (string) $snippet, $first_space + 1 );
+                        }
+                    }
+                    if ( $end < $sentence_length ) {
+                        $last_space = function_exists( 'mb_strrpos' ) ? mb_strrpos( $snippet, ' ' ) : strrpos( $snippet, ' ' );
+                        if ( false !== $last_space && $last_space > ( ( function_exists( 'mb_strlen' ) ? mb_strlen( $snippet ) : strlen( $snippet ) ) - 30 ) ) {
+                            $snippet = function_exists( 'mb_substr' ) ? mb_substr( $snippet, 0, $last_space ) : substr( (string) $snippet, 0, $last_space );
+                        }
+                    }
+
+                    $prefix   = $start > 0 ? '…' : '';
+                    $suffix   = $end < $sentence_length ? '…' : '';
+                    $sentence = $prefix . trim( (string) $snippet ) . $suffix;
+                } else {
+                    $trimmed  = function_exists( 'mb_substr' ) ? mb_substr( $sentence, 0, 237 ) : substr( $sentence, 0, 237 );
+                    $sentence = rtrim( (string) $trimmed ) . '…';
+                }
             }
 
             $key_base = function_exists( 'mb_strtolower' ) ? mb_strtolower( $sentence ) : strtolower( $sentence );
