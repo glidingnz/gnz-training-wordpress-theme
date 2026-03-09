@@ -163,7 +163,7 @@ function gnz_highlight_terms_in_content($content) {
         return $content;
     }
 
-    $pattern = '/(' . implode('|', $escaped_terms) . ')/iu';
+    $pattern = '/\b(' . implode('|', $escaped_terms) . ')\b/iu';
     $segments = preg_split('/(<[^>]+>)/u', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
     if (false === $segments || empty($segments)) {
@@ -327,12 +327,18 @@ function gnz_improved_search_sql( $search, $query ) {
     $is_phrase = (bool) preg_match( '/\s/u', $raw );
 
     if ( $is_phrase ) {
-        // Multi-word: require the exact phrase to appear in title or content.
-        $like   = '%' . $wpdb->esc_like( $raw ) . '%';
-        $search = $wpdb->prepare(
-            " AND ({$wpdb->posts}.post_title LIKE %s OR {$wpdb->posts}.post_content LIKE %s)",
-            $like,
-            $like
+        // Multi-word: require the exact phrase with word boundaries.
+        // LIKE '%phrase%' is a plain substring match and would match e.g.
+        // "single seater" for query "single seat". Use the same REGEXP
+        // boundary approach as single-word queries instead.
+        $escaped = preg_replace( '/([.+*?\[^\]$(){}=!<>|:\\\\#-])/', '\\\\$1', $raw );
+        // Normalise any whitespace in the pattern so it matches any whitespace in content.
+        $escaped = (string) preg_replace( '/\s+/u', '[[:space:]]+', $escaped );
+        $regexp  = '(^|[^a-zA-Z0-9])' . $escaped . '([^a-zA-Z0-9]|$)';
+        $search  = $wpdb->prepare(
+            " AND ({$wpdb->posts}.post_title REGEXP %s OR {$wpdb->posts}.post_content REGEXP %s)",
+            $regexp,
+            $regexp
         );
         $query->set( 'search_terms', array( $raw ) );
     } else {

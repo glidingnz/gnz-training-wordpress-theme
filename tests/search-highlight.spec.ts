@@ -115,6 +115,42 @@ test.describe('Search – phrase match precision (regression)', () => {
     });
 });
 
+test.describe('Search – phrase match precision (substring regression)', () => {
+    /**
+     * Regression: "single seat" was previously matching pages that only
+     * contained "single seater" because LIKE '%single seat%' is a plain
+     * substring match. The posts_search filter now uses REGEXP with word
+     * boundaries so "seater" pages are excluded.
+     *
+     * Every result for "single seat" must contain the exact whole phrase
+     * (i.e. "single seat" not followed immediately by a word character).
+     */
+    test('every result for "single seat" contains "single seat" as a whole phrase', async ({ page }) => {
+        await page.goto('/');
+        await page.waitForLoadState('domcontentloaded');
+        await submitSearch(page, 'single seat');
+
+        const cards = page.locator('a[role="article"]');
+        const cardCount = await cards.count();
+
+        for (let i = 0; i < cardCount; i++) {
+            const href = await cards.nth(i).getAttribute('href') ?? '';
+            const bare = href.split('?')[0];
+            await page.goto(bare);
+            await page.waitForLoadState('domcontentloaded');
+
+            const bodyText = (await page.locator('body').innerText()).toLowerCase();
+            expect(
+                /\bsingle seat\b/.test(bodyText),
+                `Result page "${bare}" does not contain the whole phrase "single seat" (may only contain "single seater")`
+            ).toBe(true);
+
+            await page.goBack();
+            await page.waitForLoadState('domcontentloaded');
+        }
+    });
+});
+
 test.describe('Search highlight – apostrophe handling', () => {
     test('query with straight apostrophe highlights text curly-quoted by WordPress', async ({ page }) => {
         await page.goto('/');
