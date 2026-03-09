@@ -94,7 +94,16 @@ get_header();
             return array();
         }
 
-        $plain_text = wp_strip_all_tags( (string) $text );
+        $raw_text = (string) $text;
+        // Insert a space before closing block-level tags so adjacent blocks
+        // don't run together after tag stripping (e.g. heading + paragraph).
+        $raw_text = preg_replace( '/<\/(p|h[1-6]|li|td|th|blockquote|div)>/i', ' ', $raw_text );
+        // Decode HTML entities (including &nbsp;) so they become real
+        // whitespace characters that the sentence splitter can work with.
+        $raw_text   = html_entity_decode( $raw_text, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+        // Replace non-breaking spaces (U+00A0) with regular spaces.
+        $raw_text   = str_replace( "\xc2\xa0", ' ', $raw_text );
+        $plain_text = wp_strip_all_tags( $raw_text );
 
         if ( '' === $plain_text ) {
             return array();
