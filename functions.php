@@ -312,7 +312,7 @@ add_filter( 'posts_where', 'gnz_exclude_empty_content_from_search', 10, 2 );
  * <mark> highlighting in search.php stay accurate.
  */
 function gnz_improved_search_sql( $search, $query ) {
-    if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() ) {
+    if ( is_admin() || ! $query->is_search() ) {
         return $search;
     }
 

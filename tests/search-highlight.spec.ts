@@ -76,6 +76,45 @@ test.describe('Search highlight – single word', () => {
     });
 });
 
+test.describe('Search – phrase match precision (regression)', () => {
+    /**
+     * Regression: "convert to single" was previously matching pages that only
+     * contained "convert to a single" because the posts_search filter was
+     * silently bypassed and WordPress fell back to its default word-split SQL
+     * (LIKE '%convert%' AND LIKE '%single%', dropping "to" as a stop word).
+     *
+     * Every result returned for a multi-word query must contain the exact
+     * phrase somewhere in its visible text.
+     */
+    test('every result for "convert to single" contains the exact phrase', async ({ page }) => {
+        await page.goto('/');
+        await page.waitForLoadState('domcontentloaded');
+        await submitSearch(page, 'convert to single');
+
+        // Collect all result card hrefs (may be empty if no pages match)
+        const cards = page.locator('a[role="article"]');
+        const cardCount = await cards.count();
+
+        for (let i = 0; i < cardCount; i++) {
+            const href = await cards.nth(i).getAttribute('href') ?? '';
+
+            // Visit the page directly (no highlight param) so we see raw content
+            const bare = href.split('?')[0];
+            await page.goto(bare);
+            await page.waitForLoadState('domcontentloaded');
+
+            const bodyText = (await page.locator('body').innerText()).toLowerCase();
+            expect(
+                bodyText,
+                `Result page "${bare}" does not contain the exact phrase "convert to single"`
+            ).toContain('convert to single');
+
+            await page.goBack();
+            await page.waitForLoadState('domcontentloaded');
+        }
+    });
+});
+
 test.describe('Search highlight – apostrophe handling', () => {
     test('query with straight apostrophe highlights text curly-quoted by WordPress', async ({ page }) => {
         await page.goto('/');
