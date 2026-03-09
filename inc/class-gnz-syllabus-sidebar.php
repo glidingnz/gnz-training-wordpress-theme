@@ -368,7 +368,7 @@ class GNZ_Syllabus_Sidebar {
 
         $dom      = new DOMDocument();
         $html     = '<!DOCTYPE html><html><body>' . $content . '</body></html>';
-        $encoding = function_exists( 'mb_convert_encoding' ) ? mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' ) : $html;
+        $encoding = mb_encode_numericentity( $html, array( 0x80, 0x10FFFF, 0, 0x1FFFFF ), 'UTF-8' );
 
         $dom->loadHTML( $encoding );
 

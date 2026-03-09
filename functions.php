@@ -214,12 +214,14 @@ function gnz_get_placeholder_page_ids($post_type = 'page') {
         return $cache[$post_type];
     }
 
-    $page_ids = get_pages(array(
-        'fields'      => 'ids',
-        'post_type'   => $post_type,
-        'post_status' => array('publish'),
-        'hierarchical'=> false,
+    $query = new WP_Query(array(
+        'fields'         => 'ids',
+        'post_type'      => $post_type,
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'no_found_rows'  => true,
     ));
+    $page_ids = $query->posts;
 
     if (empty($page_ids)) {
         $cache[$post_type] = array();
