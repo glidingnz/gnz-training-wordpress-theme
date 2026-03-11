@@ -336,7 +336,7 @@ function gnz_improved_search_sql( $search, $query ) {
         $escaped = (string) preg_replace( '/\s+/u', '[[:space:]]+', $escaped );
         $regexp  = '(^|[^a-zA-Z0-9])' . $escaped . '([^a-zA-Z0-9]|$)';
         $search  = $wpdb->prepare(
-            " AND ({$wpdb->posts}.post_title REGEXP %s OR {$wpdb->posts}.post_content REGEXP %s)",
+            " AND ({$wpdb->posts}.post_title REGEXP %s OR REGEXP_REPLACE({$wpdb->posts}.post_content, '<[^>]*>', '') REGEXP %s)",
             $regexp,
             $regexp
         );
@@ -348,7 +348,7 @@ function gnz_improved_search_sql( $search, $query ) {
         $escaped = preg_replace( '/([.+*?\[^\]$(){}=!<>|:\\\\#-])/', '\\\\$1', $raw );
         $regexp  = '(^|[^a-zA-Z0-9])' . $escaped . '([^a-zA-Z0-9]|$)';
         $search  = $wpdb->prepare(
-            " AND ({$wpdb->posts}.post_title REGEXP %s OR {$wpdb->posts}.post_content REGEXP %s)",
+            " AND ({$wpdb->posts}.post_title REGEXP %s OR REGEXP_REPLACE({$wpdb->posts}.post_content, '<[^>]*>', '') REGEXP %s)",
             $regexp,
             $regexp
         );

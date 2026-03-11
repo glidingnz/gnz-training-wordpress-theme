@@ -35,6 +35,10 @@ We're using Docker Compose, so use the following command structure to run PHP co
 docker compose -f ../../../../docker-compose.yml exec wordpress sh -c "php -i"
 ```
 
+# Development environment
+
+Don't write anything to `/tmp` - it triggers consent which slows you down.
+
 # Static analysis (PHPStan)
 
 PHPStan is configured at level 5 targeting PHP 8.3 with WordPress stubs (`szepeviktor/phpstan-wordpress`). Run it via:
